@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings - EndlessDodge</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+    .section {
+      margin: 30px 0;
+      text-align: left;
+    }
+    .section h2 {
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+    }
+    label {
+      font-size: 1.2rem;
+      margin-right: 10px;
+    }
+    input[type="range"] {
+      width: 100%;
+    }
+    input[type="text"] {
+      width: 50px;
+      text-align: center;
+    }
+    .button {
+      padding: 10px 20px;
+      font-size: 1.2rem;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    .button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Nastavení</h1>
+
+    <!-- Nastavení hlasitosti -->
+    <div class="section">
+      <h2>Hlasitost</h2>
+      <label for="musicVolume">Hudba:</label>
+      <input type="range" id="musicVolume" min="0" max="100" step="1">
+      <br><br>
+      <label for="sfxVolume">Zvukové efekty:</label>
+      <input type="range" id="sfxVolume" min="0" max="100" step="1">
+    </div>
+
+    <!-- Nastavení ovládání -->
+    <div class="section">
+      <h2>Ovládání</h2>
+      <label for="moveUp">Pohyb dopředu (W):</label>
+      <input type="text" id="moveUp" value="W">
+      <br><br>
+      <label for="moveDown">Pohyb dozadu (S):</label>
+      <input type="text" id="moveDown" value="S">
+      <br><br>
+      <label for="moveLeft">Pohyb doleva (A):</label>
+      <input type="text" id="moveLeft" value="A">
+      <br><br>
+      <label for="moveRight">Pohyb doprava (D):</label>
+      <input type="text" id="moveRight" value="D">
+      <br><br>
+      <label for="dodge">Dodge (Shift):</label>
+      <input type="text" id="dodge" value="Shift">
+    </div>
+
+    <button class="button" onclick="saveSettings()">Uložit nastavení</button>
+    <button class="button" onclick="window.location.href = 'index.html'">Zpět na Hlavní Stránku</button>
+  </div>
+
+  <script>
+    // Funkce pro načtení nastavení při načtení stránky
+    function loadSettings() {
+      const musicVolume = localStorage.getItem('musicVolume') || 50;
+      const sfxVolume = localStorage.getItem('sfxVolume') || 50;
+
+      const moveUp = localStorage.getItem('moveUp') || 'W';
+      const moveDown = localStorage.getItem('moveDown') || 'S';
+      const moveLeft = localStorage.getItem('moveLeft') || 'A';
+      const moveRight = localStorage.getItem('moveRight') || 'D';
+      const dodge = localStorage.getItem('dodge') || 'Shift';
+
+      // Nastavení hodnot pro hlasitost
+      document.getElementById('musicVolume').value = musicVolume;
+      document.getElementById('sfxVolume').value = sfxVolume;
+
+      // Nastavení hodnot pro ovládání
+      document.getElementById('moveUp').value = moveUp;
+      document.getElementById('moveDown').value = moveDown;
+      document.getElementById('moveLeft').value = moveLeft;
+      document.getElementById('moveRight').value = moveRight;
+      document.getElementById('dodge').value = dodge;
+    }
+
+    // Funkce pro uložení nastavení do localStorage
+    function saveSettings() {
+      // Hlasitost
+      const musicVolume = document.getElementById('musicVolume').value;
+      const sfxVolume = document.getElementById('sfxVolume').value;
+
+      // Ovládání
+      const moveUp = document.getElementById('moveUp').value;
+      const moveDown = document.getElementById('moveDown').value;
+      const moveLeft = document.getElementById('moveLeft').value;
+      const moveRight = document.getElementById('moveRight').value;
+      const dodge = document.getElementById('dodge').value;
+
+      // Uložení do localStorage
+      localStorage.setItem('musicVolume', musicVolume);
+      localStorage.setItem('sfxVolume', sfxVolume);
+
+      localStorage.setItem('moveUp', moveUp);
+      localStorage.setItem('moveDown', moveDown);
+      localStorage.setItem('moveLeft', moveLeft);
+      localStorage.setItem('moveRight', moveRight);
+      localStorage.setItem('dodge', dodge);
+
+      alert('Nastavení byla uložena!');
+    }
+
+    // Načtení nastavení při načtení stránky
+    window.onload = loadSettings;
+  </script>
+
+</body>
+</html>
