@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EndlessDodge - Hra</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #222;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .game-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    canvas {
+      background-color: #333;
+      border: 2px solid #fff;
+    }
+    .countdown {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 5rem;
+      font-weight: bold;
+      color: #fff;
+      text-shadow: 2px 2px 5px #000;
+    }
+    .timer {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 1.5rem;
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="game-container">
+    <div id="countdown" class="countdown">5</div>
+    <div id="timer" class="timer">0.00 s</div>
+    <canvas id="gameCanvas" width="800" height="800"></canvas>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const countdownEl = document.getElementById('countdown');
+    const timerEl = document.getElementById('timer');
+
+    // Herní proměnné
+    const gameSettings = {
+      moveUp: localStorage.getItem('moveUp') || 'W',
+      moveDown: localStorage.getItem('moveDown') || 'S',
+      moveLeft: localStorage.getItem('moveLeft') || 'A',
+      moveRight: localStorage.getItem('moveRight') || 'D',
+      dodge: localStorage.getItem('dodge') || 'Shift'
+    };
+
+    let player = {
+      x: canvas.width / 2 - 10,
+      y: canvas.height / 2 - 10,
+      width: 20,
+      height: 20,
+      speed: 5,
+      color: '#4CAF50',
+      isDodging: false, // Flag pro dodge
+      dodgeCooldown: false // Zabraňuje spamu dodgu
+    };
+
+    let timer = 0; // Čas v sekundách
+    let isGameRunning = false;
+    let keysPressed = {};
+
+    // Odpočet před spuštěním
+    function startCountdown() {
+      let count = 5;
+
+      const countdownInterval = setInterval(() => {
+        countdownEl.textContent = count > 0 ? count : 'GO';
+        if (count === 0) {
+          clearInterval(countdownInterval);
+          countdownEl.style.display = 'none';
+          startGame();
+        }
+        count--;
+      }, 1000);
+    }
+
+    // Spustit hru
+    function startGame() {
+      isGameRunning = true;
+
+      // Časomíra
+      setInterval(() => {
+        if (isGameRunning) {
+          timer += 0.01;
+          timerEl.textContent = `${timer.toFixed(2)} s`;
+        }
+      }, 10);
+
+      // Spustit hlavní herní smyčku
+      gameLoop();
+    }
+
+    // Aktualizace postavy
+function updatePlayer() {
+  if (keysPressed[gameSettings.moveUp]) {
+    player.y -= player.speed;
+  }
+  if (keysPressed[gameSettings.moveDown]) {
+    player.y += player.speed;
+  }
+  if (keysPressed[gameSettings.moveLeft]) {
+    player.x -= player.speed;
+  }
+  if (keysPressed[gameSettings.moveRight]) {
+    player.x += player.speed;
+  }
+
+  // Dodge mechanika
+  if (!player.dodgeCooldown && keysPressed[gameSettings.dodge]) {
+    startDodge();
+  }
+
+  // Zastavení u hranic arény
+  if (player.x < 0) player.x = 0;
+  if (player.y < 0) player.y = 0;
+  if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+  if (player.y + player.height > canvas.height) player.y = canvas.height - player.height;
+}
+
+
+    // Spustit dodge
+    function startDodge() {
+      player.isDodging = true;
+      player.dodgeCooldown = true;
+
+      // Nastavit efekt "ducha"
+      player.color = 'rgba(76, 175, 80, 0.5)';
+
+      // Po 0.5 sekund ukončit dodge
+      setTimeout(() => {
+        player.isDodging = false;
+        player.color = '#4CAF50'; // Zpět na původní barvu
+      }, 500);
+
+      // Cooldown pro dodge (30 sekund)
+      setTimeout(() => {
+        player.dodgeCooldown = false;
+      }, 30000);
+    }
+
+    // herního stav
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // hráč
+      ctx.fillStyle = player.color;
+      ctx.fillRect(player.x, player.y, player.width, player.height);
+
+      // arena
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // Herní smyčka
+    function gameLoop() {
+      if (isGameRunning) {
+        updatePlayer();
+        draw();
+        requestAnimationFrame(gameLoop);
+      }
+    }
+
+    // Event listeners pro klávesy
+    window.addEventListener('keydown', (e) => {
+      keysPressed[e.key.toUpperCase()] = true;
+    });
+
+    window.addEventListener('keyup', (e) => {
+      keysPressed[e.key.toUpperCase()] = false;
+    });
+
+    // Spustit odpočet při načtení stránky
+    startCountdown();
+  </script>
+
+</body>
+</html>
