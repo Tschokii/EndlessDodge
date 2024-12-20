@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EndlessDodge - Game Over</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #222;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+        .game-over {
+            text-align: center;
+            padding: 2rem;
+        }
+        h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: #ff3333;
+        }
+        .time {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+        }
+        .record-info {
+            color: #4CAF50;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        input {
+            padding: 0.5rem;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            background: #333;
+            border: 2px solid #fff;
+            color: #fff;
+            width: 200px;
+        }
+        button {
+            padding: 0.5rem 1rem;
+            font-size: 1.2rem;
+            background: #4CAF50;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            margin: 0.5rem;
+        }
+        button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-over">
+        <h1>Game Over</h1>
+        <div class="time">Čas přežití: <span id="survivalTime">0.00</span> s</div>
+        <div id="newRecord" class="record-info"></div>
+        <input type="text" id="nickname" placeholder="Zadejte přezdívku" maxlength="20">
+        <br>
+        <button onclick="saveScore()">Uložit skóre</button>
+        <button onclick="window.location.href='index.html'">Hlavní menu</button>
+    </div>
+
+    <script src="storage.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const survivalTime = urlParams.get('time');
+        
+        document.getElementById('survivalTime').textContent = survivalTime;
+
+        function saveScore() {
+            const nickname = document.getElementById('nickname').value.trim();
+            if (!nickname) {
+                alert('Prosím zadejte přezdívku');
+                return;
+            }
+
+            const currentDate = new Date().toLocaleDateString();
+            const isNewRecord = gameStorage.addRecord(nickname, survivalTime, currentDate);
+
+            const recordInfo = document.getElementById('newRecord');
+            recordInfo.style.display = 'block';
+
+            if (isNewRecord) {
+                recordInfo.textContent = 'New Personal Record!';
+            } else {
+                recordInfo.textContent = 'Score Saved!';
+            }
+
+            // Zakázat input a tlačítko po uložení
+            document.getElementById('nickname').disabled = true;
+            document.querySelector('button').disabled = true;
+        }
+    </script>
+</body>
+</html>
