@@ -92,7 +92,7 @@
   </div>
 
   <script>
-    // Funkce pro načtení nastavení při načtení stránky
+    // načtení nastavení při načtení stránky
     function loadSettings() {
       const musicVolume = localStorage.getItem('musicVolume') || 50;
       const sfxVolume = localStorage.getItem('sfxVolume') || 50;
@@ -103,11 +103,11 @@
       const moveRight = localStorage.getItem('moveRight') || 'D';
       const dodge = localStorage.getItem('dodge') || 'Shift';
 
-      // Nastavení hodnot pro hlasitost
+      // Nastavení hlasitosti
       document.getElementById('musicVolume').value = musicVolume;
       document.getElementById('sfxVolume').value = sfxVolume;
 
-      // Nastavení hodnot pro ovládání
+      // Nastavení ovládání
       document.getElementById('moveUp').value = moveUp;
       document.getElementById('moveDown').value = moveDown;
       document.getElementById('moveLeft').value = moveLeft;
@@ -115,7 +115,7 @@
       document.getElementById('dodge').value = dodge;
     }
 
-    // Funkce pro uložení nastavení do localStorage
+    // uložení nastavení do localStorage
     function saveSettings() {
       // Hlasitost
       const musicVolume = document.getElementById('musicVolume').value;

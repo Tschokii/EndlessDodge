@@ -1,175 +1,145 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Records - EndlessDodge</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f0f0f0;
-    }
-    .container {
-      width: 80%;
-      margin: 30px auto;
-      text-align: center;
-    }
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 20px;
-    }
-    table {
-      width: 100%;
-      margin-top: 30px;
-      border-collapse: collapse;
-    }
-    th, td {
-      padding: 10px;
-      text-align: center;
-      border: 1px solid #ddd;
-    }
-    th {
-      background-color: #4CAF50;
-      color: white;
-    }
-    tr:nth-child(even) {
-      background-color: #f2f2f2;
-    }
-    .topRecords {
-      max-height: 400px;
-      overflow-y: scroll;
-    }
-    .highlight {
-      background-color: #ffeb3b; /* Žluté pozadí pro vlastní rekord */
-      font-weight: bold;
-    }
-    .backButton {
-      margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 1.2rem;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .backButton:hover {
-      background-color: #45a049;
-    }
-    .top3 {
-      margin-bottom: 20px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Records - EndlessDodge</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            width: 80%;
+            margin: 30px auto;
+            text-align: center;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            margin-top: 30px;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .topRecords {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .highlight {
+            background-color: #ffeb3b;
+            font-weight: bold;
+        }
+        .backButton {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .backButton:hover {
+            background-color: #45a049;
+        }
+        .top3 {
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <h1>Records</h1>
 
-  <div class="container">
-    <h1>Records</h1>
+        <!-- TOP 3 -->
+        <div class="top3">
+            <h2>TOP 3</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pořadí</th>
+                        <th>Nick</th>
+                        <th>Datum</th>
+                        <th>Čas přežití (s)</th>
+                    </tr>
+                </thead>
+                <tbody id="top3Records">
+                </tbody>
+            </table>
+        </div>
 
-    <!-- top 3 -->
-    <div class="top3">
-      <h2></h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Pořadí</th>
-            <th>Nick</th>
-            <th>Datum</th>
-            <th>Čas přežití (s)</th>
-          </tr>
-        </thead>
-        <tbody id="top3Records">
-          <!-- top 3 rekordy zde -->
-        </tbody>
-      </table>
+        <!-- Ostatní rekordy -->
+        <div class="topRecords">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pořadí</th>
+                        <th>Nick</th>
+                        <th>Datum</th>
+                        <th>Čas přežití (s)</th>
+                    </tr>
+                </thead>
+                <tbody id="recordsList">
+                </tbody>
+            </table>
+        </div>
+
+        <button class="backButton" onclick="window.location.href='index.html'">Zpět na Hlavní Stránku</button>
     </div>
 
-    <!-- Tabulka top47 rekordu (skrolování) -->
-    <div class="topRecords">
-      <table>
-        <thead>
-          <tr>
-            <th>Pořadí</th>
-            <th>Nick</th>
-            <th>Datum</th>
-            <th>Čas přežití (s)</th>
-          </tr>
-        </thead>
-        <tbody id="recordsList">
-          <!-- Záznamy načteny a zobrazeny zde -->
-        </tbody>
-      </table>
-    </div>
+    <script src="storage.js"></script>
+    <script>
+        function loadRecords() {
+            const records = gameStorage.getAllRecords();
+            
+            // TOP 3
+            const top3Table = document.getElementById('top3Records');
+            top3Table.innerHTML = '';
 
-    <button class="backButton" onclick="window.location.href = 'index.html'">Zpět na Hlavní Stránku</button>
-  </div>
+            records.slice(0, 3).forEach((record, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${record.nickname}</td>
+                    <td>${record.date}</td>
+                    <td>${record.time.toFixed(2)} sekund</td>
+                `;
+                top3Table.appendChild(row);
+            });
 
-  <script>
-    // Funkce pro načtení TOP 50 rekordů
-    function loadRecords() {
-      const records = JSON.parse(localStorage.getItem('topRecords')) || [];
-      const currentPlayerRecord = JSON.parse(localStorage.getItem('bestRecord')) || { nick: '', time: 0, date: '' };
+            // Ostatní rekordy (4-50)
+            const recordsTable = document.getElementById('recordsList');
+            recordsTable.innerHTML = '';
 
-      // Seřadíme rekordy podle času (od nejvyššího po nejnižší)
-      records.sort((a, b) => b.time - a.time);
-
-      // Načítání prvních 3 rekordů
-      const top3Table = document.getElementById('top3Records');
-      top3Table.innerHTML = ''; // Vyprázdní tabulku před přidáním nových záznamů
-
-      records.slice(0, 3).forEach((record, index) => {
-        const row = document.createElement('tr');
-        const rankCell = document.createElement('td');
-        const nickCell = document.createElement('td');
-        const dateCell = document.createElement('td');
-        const timeCell = document.createElement('td');
-        
-        rankCell.innerText = index + 1; // Pořadí
-        nickCell.innerText = record.nick;
-        dateCell.innerText = record.date;
-        timeCell.innerText = record.time + ' sekund';
-
-        row.appendChild(rankCell);
-        row.appendChild(nickCell);
-        row.appendChild(dateCell);
-        row.appendChild(timeCell);
-        top3Table.appendChild(row);
-      });
-
-      // Načítání zbytku rekordů (47) do scrollovací tabulky
-      const recordsTable = document.getElementById('recordsList');
-      recordsTable.innerHTML = ''; // Vyprázdní tabulku před přidáním nových záznamů
-
-      records.slice(3, 50).forEach((record, index) => {
-        const row = document.createElement('tr');
-        const rankCell = document.createElement('td');
-        const nickCell = document.createElement('td');
-        const dateCell = document.createElement('td');
-        const timeCell = document.createElement('td');
-        
-        rankCell.innerText = index + 4; // Pořadí (index + 4 pro správné zobrazení od 4. místa)
-        nickCell.innerText = record.nick;
-        dateCell.innerText = record.date;
-        timeCell.innerText = record.time + ' sekund';
-
-        // Pokud je to rekord aktuálního hráče, zvýrazníme ho
-        if (record.nick === currentPlayerRecord.nick && record.time === currentPlayerRecord.time) {
-          row.classList.add('highlight');
+            records.slice(3).forEach((record, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 4}</td>
+                    <td>${record.nickname}</td>
+                    <td>${record.date}</td>
+                    <td>${record.time.toFixed(2)} sekund</td>
+                `;
+                recordsTable.appendChild(row);
+            });
         }
 
-        row.appendChild(rankCell);
-        row.appendChild(nickCell);
-        row.appendChild(dateCell);
-        row.appendChild(timeCell);
-        recordsTable.appendChild(row);
-      });
-    }
-
-    // Zavolání funkce pro načtení TOP 50 rekordů
-    window.onload = loadRecords;
-  </script>
-
+        window.onload = loadRecords;
+    </script>
 </body>
 </html>
