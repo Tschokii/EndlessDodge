@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EndlessDodge</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
+    }
+    .container {
+      text-align: center;
+    }
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+    }
+    .button {
+      display: block;
+      margin: 10px auto;
+      padding: 15px 30px;
+      font-size: 1.2rem;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 200px;
+    }
+    .button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>EndlessDodge</h1>
+    <button class="button" id="playButton">PLAY</button>
+    <button class="button" id="historyButton">History</button>
+    <button class="button" id="recordsButton">Records</button>
+    <button class="button" id="settingsButton">Settings</button>
+  </div>
+
+  <script>
+    document.getElementById('playButton').addEventListener('click', function() {
+      window.location.href = '/game.html';
+    });
+
+    document.getElementById('historyButton').addEventListener('click', function() {
+      window.location.href = '/history.html';
+    });
+
+    document.getElementById('recordsButton').addEventListener('click', function() {
+      window.location.href = '/records.html';
+    });
+
+    document.getElementById('settingsButton').addEventListener('click', function() {
+      window.location.href = '/settings.html';
+    });
+  </script>
+
+</body>
+</html>
