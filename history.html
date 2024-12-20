@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>History - EndlessDodge</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f0f0f0;
+    }
+    .container {
+      width: 80%;
+      margin: 30px auto;
+      text-align: center;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+    .record {
+      margin: 20px 0;
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border-radius: 5px;
+      font-size: 1.2rem;
+    }
+    table {
+      width: 100%;
+      margin-top: 30px;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 10px;
+      text-align: center;
+      border: 1px solid #ddd;
+    }
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+    .backButton {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1.2rem;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .backButton:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Historie Hracích Rekordů</h1>
+
+    <div id="bestRecord" class="record">
+      <h2>Nejlepší rekord:</h2>
+      <p id="recordTime">Loading...</p>
+      <p id="recordDate">Loading...</p>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Datum</th>
+          <th>Čas přežití (s)</th>
+        </tr>
+      </thead>
+      <tbody id="historyTable">
+        <!-- Záznamy se načtou zde -->
+      </tbody>
+    </table>
+
+    <button class="backButton" onclick="window.location.href = 'index.html'">Zpět na Hlavní Stránku</button>
+  </div>
+
+  <script>
+    // Funkce pro načtení historie a nejlepšího rekordu
+    function loadHistory() {
+      const history = JSON.parse(localStorage.getItem('gameHistory')) || [];
+      const bestRecord = JSON.parse(localStorage.getItem('bestRecord')) || { time: 0, date: '' };
+
+      // Zobrazení nejlepšího rekordu
+      document.getElementById('recordTime').innerText = bestRecord.time + ' sekund';
+      document.getElementById('recordDate').innerText = bestRecord.date;
+
+      // Načítání záznamů do tabulky
+      const historyTable = document.getElementById('historyTable');
+      historyTable.innerHTML = ''; // Vyprázdní tabulku před přidáním nových záznamů
+
+      history.forEach(entry => {
+        const row = document.createElement('tr');
+        const dateCell = document.createElement('td');
+        const timeCell = document.createElement('td');
+        
+        dateCell.innerText = entry.date;
+        timeCell.innerText = entry.time + ' sekund';
+
+        row.appendChild(dateCell);
+        row.appendChild(timeCell);
+        historyTable.appendChild(row);
+      });
+    }
+
+    // Zavolání funkce pro načtení historie
+    window.onload = loadHistory;
+  </script>
+
+</body>
+</html>
