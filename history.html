@@ -5,86 +5,229 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>History - EndlessDodge</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        @font-face {
+            font-family: 'Kosmos';
+            src: url('kosmos.ttf') format('truetype');
+        }
+
+        * {
             margin: 0;
             padding: 0;
-            background-color: #f0f0f0;
+            box-sizing: border-box;
         }
+
+        body {
+            font-family: 'Arial', sans-serif;  /* Changed default font */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: #000;
+            overflow: hidden;
+            color: #fff;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -150%;
+            left: -150%;
+            width: 400%;
+            height: 400%;
+            background: radial-gradient(
+                circle at center,
+                #8B0000 5%,
+                #2B2B2B 20%,
+                #1a1a1a 60%,
+                #111111 70%
+            );
+            animation: lavaFlow 15s ease-in-out infinite;
+            z-index: -2;
+            opacity: 0.7;
+            transform-origin: center center;
+        }
+
+        @keyframes lavaFlow {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.2); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
         .container {
-            width: 80%;
+            width: 90%;
+            max-width: 800px;
             margin: 30px auto;
             text-align: center;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(139, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: containerPulse 3s ease-in-out infinite;
+            position: relative;
+            z-index: 1;
         }
+
+        @keyframes containerPulse {
+            0%, 100% { box-shadow: 0 0 30px rgba(139, 0, 0, 0.3); }
+            50% { box-shadow: 0 0 50px rgba(139, 0, 0, 0.5); }
+        }
+
         h1 {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
+            font-family: 'Kosmos', Arial, sans-serif;  /* Keep Kosmos font for main title */
+            font-size: 3rem;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: #fff;
+            text-shadow: 
+                3px 3px 0 #8B0000,
+                -1px -1px 0 #8B0000,
+                1px -1px 0 #8B0000,
+                -1px 1px 0 #8B0000,
+                1px 1px 0 #8B0000;
+            animation: titleGlow 3s ease-in-out infinite;
         }
+
+        @keyframes titleGlow {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.3); }
+        }
+
         .record {
             margin: 20px 0;
-            padding: 10px;
-            background-color: #4CAF50;
-            color: white;
-            border-radius: 5px;
+            padding: 20px;
+            background: rgba(139, 0, 0, 0.3);
+            border-radius: 10px;
             font-size: 1.2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: recordPulse 2s ease-in-out infinite;
         }
+
+        @keyframes recordPulse {
+            0%, 100% { background: rgba(139, 0, 0, 0.3); }
+            50% { background: rgba(139, 0, 0, 0.5); }
+        }
+
+        h2 {
+            font-family: 'Kosmos', Arial, sans-serif;  /* Keep Kosmos font for section title */
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        .table-container {
+            max-height: 400px;  /* Added fixed height for scrolling */
+            overflow-y: auto;   /* Added vertical scrolling */
+            margin-top: 30px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
         table {
             width: 100%;
-            margin-top: 30px;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0;
         }
+
         th, td {
-            padding: 10px;
+            padding: 15px;
             text-align: center;
-            border: 1px solid #ddd;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
+
         th {
-            background-color: #4CAF50;
+            background: linear-gradient(45deg, #2B2B2B, #8B0000);
             color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: bold;
+            text-shadow: 1px 1px 0 #000;
+            position: sticky;  /* Make headers stick to top */
+            top: 0;
+            z-index: 1;
         }
+
         tr:nth-child(even) {
-            background-color: #f2f2f2;
+            background: rgba(255, 255, 255, 0.05);
         }
+
+        tr:hover {
+            background: rgba(139, 0, 0, 0.2);
+        }
+
         .backButton {
-            margin-top: 20px;
-            padding: 10px 20px;
+            display: inline-block;
+            margin: 2rem 0.5rem;
+            padding: 1rem 2rem;
             font-size: 1.2rem;
-            background-color: #4CAF50;
+            font-family: 'Arial', sans-serif;  /* Changed to Arial for better readability */
+            background: linear-gradient(45deg, #2B2B2B, #8B0000);
             color: white;
-            border: none;
-            border-radius: 5px;
+            border: 2px solid #fff;
+            border-radius: 10px;
             cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.1em;
+            text-shadow: 1px 1px 0 #000;
+            animation: borderGlow 2s ease-in-out infinite;
         }
-        .backButton:hover {
-            background-color: #45a049;
+
+        /* Scrollbar styling */
+        .table-container::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .table-container::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background: rgba(139, 0, 0, 0.5);
+            border-radius: 5px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(139, 0, 0, 0.7);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Historie Tvých Her</h1>
+        <h1>History of your games</h1>
 
         <div id="bestRecord" class="record">
-            <h2>Nejlepší rekord:</h2>
+            <h2>Best record</h2>
             <p id="recordNick">Loading...</p>
             <p id="recordTime">Loading...</p>
             <p id="recordDate">Loading...</p>
         </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Nick</th>
-                    <th>Datum</th>
-                    <th>Čas přežití (s)</th>
-                </tr>
-            </thead>
-            <tbody id="historyTable">
-                <!-- Záznamy se načtou zde -->
-            </tbody>
-        </table>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTable">
+                    <!-- Záznamy se načtou zde -->
+                </tbody>
+            </table>
+        </div>
 
-        <button class="backButton" onclick="window.location.href='index.html'">Zpět na Hlavní Stránku</button>
+        <button class="backButton" onclick="window.location.href='index.html'">Back to main page</button>
     </div>
 
     <script src="storage.js"></script>
@@ -103,11 +246,14 @@
                 document.getElementById('recordDate').innerText = bestRecord.date;
             }
 
-            // Načítání všech záznamů do tabulky
+            // Načítání pouze posledních 10 záznamů do tabulky
             const historyTable = document.getElementById('historyTable');
             historyTable.innerHTML = '';
 
-            records.forEach(record => {
+            // Získání posledních 10 záznamů
+            const lastTenRecords = records.slice(0, 10);
+
+            lastTenRecords.forEach(record => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${record.nickname}</td>

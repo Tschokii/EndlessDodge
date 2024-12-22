@@ -5,90 +5,256 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Settings - EndlessDodge</title>
   <style>
+    @font-face {
+      font-family: 'Kosmos';
+      src: url('kosmos.ttf') format('truetype');
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f0f0f0;
-      padding: 20px;
+      font-family: 'Kosmos', Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background: #000;
+      overflow: hidden;
+      color: #fff;
+      position: relative;
     }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: -150%;
+      left: -150%;
+      width: 400%;
+      height: 400%;
+      background: radial-gradient(
+        circle at center,
+        #8B0000 5%,
+        #2B2B2B 20%,
+        #1a1a1a 60%,
+        #111111 70%
+      );
+      animation: lavaFlow 15s ease-in-out infinite;
+      z-index: -2;
+      opacity: 0.7;
+      transform-origin: center center;
+    }
+
+    @keyframes lavaFlow {
+      0% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(180deg) scale(1.2); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+
     .container {
-      max-width: 600px;
-      margin: 0 auto;
       text-align: center;
+      padding: 2rem;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(139, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      animation: containerPulse 3s ease-in-out infinite;
+      position: relative;
+      z-index: 1;
+      max-width: 600px;
+      width: 90%;
     }
+
+    @keyframes containerPulse {
+      0%, 100% { box-shadow: 0 0 30px rgba(139, 0, 0, 0.3); }
+      50% { box-shadow: 0 0 50px rgba(139, 0, 0, 0.5); }
+    }
+
     h1 {
-      font-size: 2.5rem;
-      margin-bottom: 20px;
+      font-size: 3rem;
+      margin-bottom: 2rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: #fff;
+      text-shadow: 
+        3px 3px 0 #8B0000,
+        -1px -1px 0 #8B0000,
+        1px -1px 0 #8B0000,
+        -1px 1px 0 #8B0000,
+        1px 1px 0 #8B0000;
+      animation: titleGlow 3s ease-in-out infinite;
     }
-    .section {
-      margin: 30px 0;
-      text-align: left;
-    }
-    .section h2 {
+
+    h2 {
       font-size: 1.8rem;
-      margin-bottom: 10px;
+      margin: 1rem 0;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #fff;
+      text-shadow: 2px 2px 0 #8B0000;
     }
+
+    .section {
+      margin: 2rem 0;
+      text-align: left;
+      padding: 1.5rem;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
     label {
       font-size: 1.2rem;
       margin-right: 10px;
+      display: inline-block;
+      width: 200px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
+
     input[type="range"] {
-      width: 100%;
-    }
-    input[type="text"] {
-      width: 50px;
-      text-align: center;
-    }
-    .button {
-      padding: 10px 20px;
-      font-size: 1.2rem;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
+      width: 200px;
+      margin: 10px 0;
+      background: rgba(255, 255, 255, 0.1);
       border-radius: 5px;
-      cursor: pointer;
-      margin-top: 20px;
+      height: 8px;
+      -webkit-appearance: none;
     }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      background: #8B0000;
+      border: 2px solid #fff;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    input[type="text"] {
+      width: 80px;
+      padding: 5px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 5px;
+      color: white;
+      font-family: 'Kosmos', Arial, sans-serif;
+      text-align: center;
+      margin: 5px 0;
+    }
+
+    .volume-value {
+      display: inline-block;
+      width: 40px;
+      text-align: right;
+      margin-left: 10px;
+    }
+
+    .button {
+      display: inline-block;
+      margin: 1rem 0.5rem;
+      padding: 1rem 2rem;
+      font-size: 1.2rem;
+      font-family: 'Kosmos', Arial, sans-serif;
+      background: linear-gradient(45deg, #2B2B2B, #8B0000);
+      color: white;
+      border: 2px solid #fff;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      position: relative;
+      overflow: hidden;
+      letter-spacing: 0.1em;
+      text-shadow: 1px 1px 0 #000;
+      animation: borderGlow 2s ease-in-out infinite;
+    }
+
+    @keyframes borderGlow {
+      0%, 100% { 
+        border-color: rgba(255, 255, 255, 1);
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+      }
+      50% { 
+        border-color: rgba(255, 255, 255, 0.3);
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+      }
+    }
+
     .button:hover {
-      background-color: #45a049;
+      transform: scale(1.05);
+    }
+
+    .button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+      );
+      transition: 0.5s;
+    }
+
+    .button:hover::before {
+      left: 100%;
     }
   </style>
 </head>
 <body>
-
   <div class="container">
-    <h1>Nastavení</h1>
+    <h1>Settings</h1>
 
-    <!-- Nastavení hlasitosti -->
     <div class="section">
-      <h2>Hlasitost</h2>
-      <label for="musicVolume">Hudba:</label>
-      <input type="range" id="musicVolume" min="0" max="100" step="1">
-      <br><br>
-      <label for="sfxVolume">Zvukové efekty:</label>
-      <input type="range" id="sfxVolume" min="0" max="100" step="1">
+      <h2>Volume</h2>
+      <div>
+        <label for="musicVolume">Music:</label>
+        <input type="range" id="musicVolume" min="0" max="100" step="1">
+        <span id="musicVolumeValue" class="volume-value">50</span>
+      </div>
+      <div>
+        <label for="sfxVolume">Other:</label>
+        <input type="range" id="sfxVolume" min="0" max="100" step="1">
+        <span id="sfxVolumeValue" class="volume-value">50</span>
+      </div>
+    </div>
+    
+    <div class="section">
+      <h2>Controls</h2>
+      <div>
+        <label for="moveUp">Move up:</label>
+        <input type="text" id="moveUp" value="W">
+      </div>
+      <div>
+        <label for="moveDown">Move down:</label>
+        <input type="text" id="moveDown" value="S">
+      </div>
+      <div>
+        <label for="moveLeft">Move left:</label>
+        <input type="text" id="moveLeft" value="A">
+      </div>
+      <div>
+        <label for="moveRight">Move right:</label>
+        <input type="text" id="moveRight" value="D">
+      </div>
+      <div>
+        <label for="dodge">Dodge:</label>
+        <input type="text" id="dodge" value="Shift">
+      </div>
     </div>
 
-    <!-- Nastavení ovládání -->
-    <div class="section">
-      <h2>Ovládání</h2>
-      <label for="moveUp">Pohyb dopředu (W):</label>
-      <input type="text" id="moveUp" value="W">
-      <br><br>
-      <label for="moveDown">Pohyb dozadu (S):</label>
-      <input type="text" id="moveDown" value="S">
-      <br><br>
-      <label for="moveLeft">Pohyb doleva (A):</label>
-      <input type="text" id="moveLeft" value="A">
-      <br><br>
-      <label for="moveRight">Pohyb doprava (D):</label>
-      <input type="text" id="moveRight" value="D">
-      <br><br>
-      <label for="dodge">Dodge (Shift):</label>
-      <input type="text" id="dodge" value="Shift">
-    </div>
-
-    <button class="button" onclick="saveSettings()">Uložit nastavení</button>
-    <button class="button" onclick="window.location.href = 'index.html'">Zpět na Hlavní Stránku</button>
+    <button class="button" onclick="saveSettings()">Save settings</button>
+    <button class="button" onclick="window.location.href = 'index.html'">Back</button>
   </div>
 
   <script>
@@ -106,6 +272,10 @@
       // Nastavení hlasitosti
       document.getElementById('musicVolume').value = musicVolume;
       document.getElementById('sfxVolume').value = sfxVolume;
+      
+      // Aktualizace zobrazených hodnot
+      document.getElementById('musicVolumeValue').textContent = musicVolume;
+      document.getElementById('sfxVolumeValue').textContent = sfxVolume;
 
       // Nastavení ovládání
       document.getElementById('moveUp').value = moveUp;
@@ -141,9 +311,17 @@
       alert('Nastavení byla uložena!');
     }
 
+    // Aktualizace zobrazených hodnot hlasitosti při změně
+    document.getElementById('musicVolume').addEventListener('input', function(e) {
+      document.getElementById('musicVolumeValue').textContent = e.target.value;
+    });
+
+    document.getElementById('sfxVolume').addEventListener('input', function(e) {
+      document.getElementById('sfxVolumeValue').textContent = e.target.value;
+    });
+
     // Načtení nastavení při načtení stránky
     window.onload = loadSettings;
   </script>
-
 </body>
 </html>
