@@ -75,390 +75,585 @@
     <canvas id="gameCanvas" width="800" height="800"></canvas>
   </div>
 
-  <script src="storage.js"></script>
   <script>
+    // Audio Manager pro správu zvuků
+    class AudioManager {
+      constructor() {
+        this.welcomeSong = new Audio('./WelcomeSong.mp3');
+        this.welcomeSong.loop = true;
+        
+        this.sounds = {
+          voice_5: new Audio('./voice_5.mp3'),
+          voice_4: new Audio('./voice_4.mp3'),
+          voice_3: new Audio('./voice_3.mp3'),
+          voice_2: new Audio('./voice_2.mp3'),
+          voice_1: new Audio('./voice_1.mp3'),
+          voice_go: new Audio('./voice_go.mp3'),
+        };
+        
+        this.musicVolume = localStorage.getItem('musicVolume') || 50;
+        this.sfxVolume = localStorage.getItem('sfxVolume') || 50;
+        this.updateVolumes();
+      }
 
-// Wave Manager Class
-class WaveManager {
-  constructor() {
-    this.enemies = [];
-    this.enemy2 = [];
-    this.currentWave = 0;
-    this.nextWaveTime = 0;
-    this.waveDuration = 1;
-    this.startTime = 3.3;
-    this.enemy2StartTime = 13.0;
-    this.enemy2Started = false;
-    this.minimumDistance = 100;
-    this.maxEnemies = 3;
-    this.maxEnemiesAfterThreshold = 5;
-    this.thresholdTime = 23.8;
-    this.shouldSpawnNewWave = true;
-  }
+      normalizeVolume(volume) {
+        return volume / 100;
+      }
 
-  getSpawnPositionsVertical(canvasWidth, count) {
-    const positions = [];
-    const sectionWidth = canvasWidth / count;
-    const margin = sectionWidth * 0.2; 
-    
-    for (let i = 0; i < count; i++) {
+      fadeIn(duration) {
+        this.welcomeSong.volume = 0;
+        this.welcomeSong.play();
+        
+        const increment = this.normalizeVolume(this.musicVolume) / (duration * 60);
+        let currentVolume = 0;
+        
+        const fadeInterval = setInterval(() => {
+          currentVolume += increment;
+          if (currentVolume >= this.normalizeVolume(this.musicVolume)) {
+            this.welcomeSong.volume = this.normalizeVolume(this.musicVolume);
+            clearInterval(fadeInterval);
+          } else {
+            this.welcomeSong.volume = currentVolume;
+          }
+        }, 1000 / 60);
+      }
 
-      const sectionStart = sectionWidth * i + margin;
-      const sectionEnd = sectionWidth * (i + 1) - margin;
-      
+      updateVolumes() {
+        this.musicVolume = localStorage.getItem('musicVolume') || 50;
+        this.sfxVolume = localStorage.getItem('sfxVolume') || 50;
+        
+        this.welcomeSong.volume = this.normalizeVolume(this.musicVolume);
+        Object.values(this.sounds).forEach(sound => {
+          sound.volume = this.normalizeVolume(this.sfxVolume);
+        });
+      }
 
-      const x = sectionStart + Math.random() * (sectionEnd - sectionStart);
-      positions.push(x);
-    }
-    
-
-    return positions.sort(() => Math.random() - 0.5);
-  }
-
-  getSpawnPositionsHorizontal(canvasHeight, count) {
-    const positions = [];
-    const sectionHeight = canvasHeight / count;
-    const margin = sectionHeight * 0.2;
-    
-    for (let i = 0; i < count; i++) {
-
-      const sectionStart = sectionHeight * i + margin;
-      const sectionEnd = sectionHeight * (i + 1) - margin;
-      
-      const y = sectionStart + Math.random() * (sectionEnd - sectionStart);
-      positions.push(y);
-    }
-    
-    return positions.sort(() => Math.random() - 0.5);
-  }
-
-  createEnemy(x, canvasHeight) {
-    const radius = 10;
-    const spawnFromTop = Math.random() < 0.5;
-    const y = spawnFromTop ? -radius : canvasHeight + radius;
-    const angle = spawnFromTop ? Math.PI / 2 : -Math.PI / 2;
-
-    return {
-      x,
-      y,
-      radius,
-      speed: 2,
-      angle,
-      active: true,
-    };
-  }
-
-  createEnemy2(y, canvasWidth) {
-    const radius = 10;
-    const spawnFromLeft = Math.random() < 0.5;
-    const x = spawnFromLeft ? -radius : canvasWidth + radius;
-    const angle = spawnFromLeft ? 0 : Math.PI;
-
-    return {
-      x,
-      y,
-      radius,
-      speed: 2,
-      angle,
-      active: true,
-    };
-  }
-
-  spawnEnemyWave(canvasWidth, canvasHeight, count) {
-    const spawnPositions = this.getSpawnPositionsVertical(canvasWidth, count);
-    return spawnPositions.map(x => this.createEnemy(x, canvasHeight));
-  }
-
-  spawnEnemy2Wave(canvasWidth, canvasHeight, count) {
-    const spawnPositions = this.getSpawnPositionsHorizontal(canvasHeight, count);
-    return spawnPositions.map(y => this.createEnemy2(y, canvasWidth));
-  }
-
-  update(timer, player, canvasWidth, canvasHeight) {
-    if (timer >= this.nextWaveTime) {
-      this.currentWave++;
-      this.nextWaveTime = timer + this.waveDuration;
-
-      const maxCount = timer >= this.thresholdTime ? this.maxEnemiesAfterThreshold : this.maxEnemies;
-
-      if (timer >= this.startTime && timer < this.enemy2StartTime) {
-        if (this.enemies.length === 0 && this.shouldSpawnNewWave) {
-          this.enemies = this.spawnEnemyWave(canvasWidth, canvasHeight, maxCount);
-          this.shouldSpawnNewWave = false;
+      playSound(soundName) {
+        if (this.sounds[soundName]) {
+          this.sounds[soundName].currentTime = 0;
+          this.sounds[soundName].volume = this.normalizeVolume(this.sfxVolume);
+          this.sounds[soundName].play().catch(error => {
+            console.error(`Chyba při přehrávání zvuku "${soundName}":`, error);
+          });
         }
-      } else if (timer >= this.enemy2StartTime) {
-        if (!this.enemy2Started) {
-          this.enemy2Started = true;
+      }
+
+      stopMusic() {
+        this.welcomeSong.pause();
+        this.welcomeSong.currentTime = 0;
+      }
+    }
+
+    // Player Class
+    class Player {
+      constructor(canvasWidth, canvasHeight) {
+        this.width = 20;
+        this.height = 20;
+        this.x = canvasWidth / 2 - this.width / 2;
+        this.y = canvasHeight / 2 - this.height / 2;
+        this.speed = 3;
+        this.color = '#4CAF50';
+        this.isDodging = false;
+        this.dodgeCooldown = false;
+      }
+
+      update(keysPressed, gameSettings, canvasWidth, canvasHeight) {
+        if (keysPressed[gameSettings.moveUp]) this.y -= this.speed;
+        if (keysPressed[gameSettings.moveDown]) this.y += this.speed;
+        if (keysPressed[gameSettings.moveLeft]) this.x -= this.speed;
+        if (keysPressed[gameSettings.moveRight]) this.x += this.speed;
+
+        if (keysPressed[gameSettings.dodge] && !this.dodgeCooldown) {
+          this.dodge();
+        }
+
+        this.constrainToCanvas(canvasWidth, canvasHeight);
+      }
+
+      dodge() {
+        this.isDodging = true;
+        this.color = 'rgba(255, 255, 255, 0.2)';
+        
+        setTimeout(() => {
+          this.isDodging = false;
+          this.color = '#4CAF50';
+        }, 500);
+        
+        this.dodgeCooldown = true;
+        setTimeout(() => this.dodgeCooldown = false, 10000);
+      }
+
+      constrainToCanvas(canvasWidth, canvasHeight) {
+        this.x = Math.max(0, Math.min(canvasWidth - this.width, this.x));
+        this.y = Math.max(0, Math.min(canvasHeight - this.height, this.y));
+      }
+
+      draw(ctx) {
+        ctx.fillStyle = this.color;
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+      }
+    }
+
+    // Wave Manager Class
+    class WaveManager {
+      constructor() {
+        this.enemies = [];
+        this.enemy2 = [];
+        this.enemy3 = [];
+        this.enemy4 = null;
+        this.currentWave = 0;
+        this.nextWaveTime = 0;
+        this.waveDuration = 1;
+        this.startTime = 3.3;
+        this.enemy2StartTime = 13.0;
+        this.enemy3StartTime = 32.0;
+        this.enemy4StartTime = 51.0;
+        this.enemy2Started = false;
+        this.enemy3Started = false;
+        this.enemy4Started = false;
+        this.minimumDistance = 100;
+        this.maxEnemies = 3;
+        this.maxEnemiesAfterThreshold = 5;
+        this.maxEnemy3 = 1;
+        this.enemy3SpawnInterval = 1;
+        this.lastEnemy3SpawnTime = 0;
+        this.thresholdTime = 23.8;
+        this.shouldSpawnNewWave = true;
+        this.pauseStartTime = 32.0;
+        this.pauseEndTime = 42.0;
+        this.isEnemySpawningPaused = false;
+      }
+
+      getSpawnPositionsVertical(canvasWidth, count) {
+        const positions = [];
+        const sectionWidth = canvasWidth / count;
+        const margin = sectionWidth * 0.2;
+        
+        for (let i = 0; i < count; i++) {
+          const sectionStart = sectionWidth * i + margin;
+          const sectionEnd = sectionWidth * (i + 1) - margin;
+          const x = sectionStart + Math.random() * (sectionEnd - sectionStart);
+          positions.push(x);
         }
         
-        if (this.enemies.length === 0 && this.enemy2.length === 0 && this.shouldSpawnNewWave) {
-          this.enemies = this.spawnEnemyWave(canvasWidth, canvasHeight, maxCount);
-          this.enemy2 = this.spawnEnemy2Wave(canvasWidth, canvasHeight, maxCount);
-          this.shouldSpawnNewWave = false;
+        return positions.sort(() => Math.random() - 0.5);
+      }
+
+      getSpawnPositionsHorizontal(canvasHeight, count) {
+        const positions = [];
+        const sectionHeight = canvasHeight / count;
+        const margin = sectionHeight * 0.2;
+        
+        for (let i = 0; i < count; i++) {
+          const sectionStart = sectionHeight * i + margin;
+          const sectionEnd = sectionHeight * (i + 1) - margin;
+          const y = sectionStart + Math.random() * (sectionEnd - sectionStart);
+          positions.push(y);
         }
+        
+        return positions.sort(() => Math.random() - 0.5);
       }
-    }
 
-    this.updateEnemies(this.enemies, canvasWidth, canvasHeight);
-    this.updateEnemies(this.enemy2, canvasWidth, canvasHeight);
+      createEnemy(x, canvasHeight) {
+        const radius = 10;
+        const spawnFromTop = Math.random() < 0.5;
+        const y = spawnFromTop ? -radius : canvasHeight + radius;
+        const angle = spawnFromTop ? Math.PI / 2 : -Math.PI / 2;
 
-    if (timer >= this.enemy2StartTime) {
-      if (this.enemies.length === 0 && this.enemy2.length === 0) {
-        this.shouldSpawnNewWave = true;
+        return {
+          x,
+          y,
+          radius,
+          speed: 2,
+          angle,
+          active: true,
+        };
       }
-    } else {
-      if (this.enemies.length === 0) {
-        this.shouldSpawnNewWave = true;
+
+      createEnemy2(y, canvasWidth) {
+        const radius = 10;
+        const spawnFromLeft = Math.random() < 0.5;
+        const x = spawnFromLeft ? -radius : canvasWidth + radius;
+        const angle = spawnFromLeft ? 0 : Math.PI;
+
+        return {
+          x,
+          y,
+          radius,
+          speed: 2,
+          angle,
+          active: true,
+        };
       }
-    }
-  }
 
-  updateEnemies(enemies, canvasWidth, canvasHeight) {
-    for (let i = enemies.length - 1; i >= 0; i--) {
-      const enemy = enemies[i];
-      if (enemy.active) {
-        enemy.x += Math.cos(enemy.angle) * enemy.speed;
-        enemy.y += Math.sin(enemy.angle) * enemy.speed;
-        enemy.speed += 0.001;
+      createEnemy3(canvasWidth, canvasHeight, player) {
+        const radius = 50;
+        let x, y;
 
-        if (enemy.x < -50 || enemy.x > canvasWidth + 50 || 
-            enemy.y < -50 || enemy.y > canvasHeight + 50) {
-          enemies.splice(i, 1);
-        }
-      }
-    }
-  }
+        if (player) {
+          const offset = 10;
+          x = player.x + Math.random() * offset * 2 - offset;
+          y = player.y + Math.random() * offset * 2 - offset;
 
-  checkCollisions(player) {
-    const checkGroup = (enemies) => {
-      return enemies.some(enemy => {
-        const distance = Math.hypot(player.x - enemy.x, player.y - enemy.y);
-        return distance < player.width / 2 + enemy.radius && !player.isDodging;
-      });
-    };
-
-    return checkGroup(this.enemies) || checkGroup(this.enemy2);
-  }
-
-  draw(ctx) {
-    [...this.enemies, ...this.enemy2].forEach(enemy => {
-      ctx.beginPath();
-      ctx.arc(enemy.x, enemy.y, enemy.radius, 0, Math.PI * 2);
-      ctx.fillStyle = 'red';
-      ctx.fill();
-      ctx.closePath();
-    });
-  }
-}
-
-
-    // Game initialization
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    const countdownEl = document.getElementById('countdown');
-    const timerEl = document.getElementById('timer');
-    const readyButton = document.getElementById('readyButton');
-
-    // Audio setup
-    const welcomeSong = new Audio('./WelcomeSong.mp3');
-    welcomeSong.loop = true;
-
-    const sounds = {
-      voice_5: new Audio('./voice_5.mp3'),
-      voice_4: new Audio('./voice_4.mp3'),
-      voice_3: new Audio('./voice_3.mp3'),
-      voice_2: new Audio('./voice_2.mp3'),
-      voice_1: new Audio('./voice_1.mp3'),
-      voice_go: new Audio('./voice_go.mp3'),
-    };
-
-    // Zvuk z local storage
-    let musicVolume = localStorage.getItem('musicVolume') || 50;
-    let sfxVolume = localStorage.getItem('sfxVolume') || 50;
-
-  
-    const normalizeVolume = (volume) => volume / 100;
-
-    function fadeIn(audio, duration) {
-      audio.volume = 0;
-      audio.play();
-      
-      const increment = normalizeVolume(musicVolume) / (duration * 60);
-      let currentVolume = 0;
-      
-      const fadeInterval = setInterval(() => {
-        currentVolume += increment;
-        if (currentVolume >= normalizeVolume(musicVolume)) {
-          audio.volume = normalizeVolume(musicVolume);
-          clearInterval(fadeInterval);
+          x = Math.max(radius, Math.min(canvasWidth - radius, x));
+          y = Math.max(radius, Math.min(canvasHeight - radius, y));
         } else {
-          audio.volume = currentVolume;
+          x = radius + Math.random() * (canvasWidth - 2 * radius);
+          y = radius + Math.random() * (canvasHeight - 2 * radius);
         }
-      }, 1000 / 60);
-    }
 
-    function updateVolumes() {
-      musicVolume = localStorage.getItem('musicVolume') || 50;
-      sfxVolume = localStorage.getItem('sfxVolume') || 50;
-      
-      welcomeSong.volume = normalizeVolume(musicVolume);
-      
-      Object.values(sounds).forEach(sound => {
-        sound.volume = normalizeVolume(sfxVolume);
-      });
-    }
+        return {
+          x,
+          y,
+          radius,
+          active: true,
+          spawnTime: performance.now(),
+          isDeadly: false,
+          warningPhase: true,
+          transformationTime: 2000,
+          deadlyDuration: 1000,
+          opacity: 0.3,
+          lastBlinkTime: performance.now(),
+          blinkState: true,
+          lifetime: 3000
+        };
+      }
 
-    function playSound(soundName) {
-      if (sounds[soundName]) {
-        sounds[soundName].currentTime = 0;
-        sounds[soundName].volume = normalizeVolume(sfxVolume);
-        sounds[soundName].play().catch((error) => {
-          console.error(`Chyba při přehrávání zvuku "${soundName}":`, error);
+      createEnemy4(canvasWidth, canvasHeight) {
+        return {
+          width: 50,
+          height: 50,
+          maxWidth: 200,
+          maxHeight: 200,
+          growing: true,
+          growthSpeed: 0.2,
+          opacity: 0.5,
+        };
+      }
+
+      spawnEnemyWave(canvasWidth, canvasHeight, count) {
+        const spawnPositions = this.getSpawnPositionsVertical(canvasWidth, count);
+        return spawnPositions.map(x => this.createEnemy(x, canvasHeight));
+      }
+
+      spawnEnemy2Wave(canvasWidth, canvasHeight, count) {
+        const spawnPositions = this.getSpawnPositionsHorizontal(canvasHeight, count);
+        return spawnPositions.map(y => this.createEnemy2(y, canvasWidth));
+      }
+
+      update(timer, player, canvasWidth, canvasHeight) {
+        if (timer >= this.pauseStartTime && timer < this.pauseEndTime) {
+          this.isEnemySpawningPaused = true;
+          this.enemies = [];
+          this.enemy2 = [];
+        } else {
+          this.isEnemySpawningPaused = false;
+        }
+
+        if (timer >= this.nextWaveTime && !this.isEnemySpawningPaused) {
+          this.currentWave++;
+          this.nextWaveTime = timer + this.waveDuration;
+
+          const maxCount = timer >= this.thresholdTime ? this.maxEnemiesAfterThreshold : this.maxEnemies;
+
+          if (timer >= this.startTime && timer < this.enemy2StartTime) {
+            if (this.enemies.length === 0 && this.shouldSpawnNewWave) {
+              this.enemies = this.spawnEnemyWave(canvasWidth, canvasHeight, maxCount);
+              this.shouldSpawnNewWave = false;
+            }
+          } else if (timer >= this.enemy2StartTime) {
+            if (!this.enemy2Started) {
+              this.enemy2Started = true;
+            }
+            
+            if (this.enemies.length === 0 && this.enemy2.length === 0 && this.shouldSpawnNewWave) {
+              this.enemies = this.spawnEnemyWave(canvasWidth, canvasHeight, maxCount);
+              this.enemy2 = this.spawnEnemy2Wave(canvasWidth, canvasHeight, maxCount);
+              this.shouldSpawnNewWave = false;
+            }
+          }
+        }
+
+        if (timer >= this.enemy3StartTime) {
+          if (!this.enemy3Started) {
+            this.enemy3Started = true;
+            this.lastEnemy3SpawnTime = timer;
+          }
+
+          if (timer - this.lastEnemy3SpawnTime >= this.enemy3SpawnInterval && 
+              this.enemy3.length < this.maxEnemy3) {
+            this.enemy3.push(this.createEnemy3(canvasWidth, canvasHeight, player));
+            this.lastEnemy3SpawnTime = timer;
+          }
+        }
+
+        if (timer >= this.enemy4StartTime) {
+          if (!this.enemy4Started) {
+            this.enemy4Started = true;
+            this.enemy4 = this.createEnemy4(canvasWidth, canvasHeight);
+          }
+
+          if (this.enemy4) {
+            if (this.enemy4.growing) {
+              this.enemy4.width += this.enemy4.growthSpeed;
+              this.enemy4.height += this.enemy4.growthSpeed;
+              if (this.enemy4.width >= this.enemy4.maxWidth || 
+                  this.enemy4.height >= this.enemy4.maxHeight) {this.enemy4.growing = false;
+              }
+            } else {
+              this.enemy4.width -= this.enemy4.growthSpeed;
+              this.enemy4.height -= this.enemy4.growthSpeed;
+              if (this.enemy4.width <= 50 || this.enemy4.height <= 50) {
+                this.enemy4.growing = true;
+              }
+            }
+          }
+        }
+
+        this.updateEnemies(this.enemies, canvasWidth, canvasHeight);
+        this.updateEnemies(this.enemy2, canvasWidth, canvasHeight);
+        this.updateEnemy3();
+
+        if (!this.isEnemySpawningPaused) {
+          if (timer >= this.enemy2StartTime) {
+            if (this.enemies.length === 0 && this.enemy2.length === 0) {
+              this.shouldSpawnNewWave = true;
+            }
+          } else {
+            if (this.enemies.length === 0) {
+              this.shouldSpawnNewWave = true;
+            }
+          }
+        }
+      }
+
+      updateEnemies(enemies, canvasWidth, canvasHeight) {
+        for (let i = enemies.length - 1; i >= 0; i--) {
+          const enemy = enemies[i];
+          if (enemy.active) {
+            enemy.x += Math.cos(enemy.angle) * enemy.speed;
+            enemy.y += Math.sin(enemy.angle) * enemy.speed;
+            enemy.speed += 0.001;
+
+            if (enemy.x < -50 || enemy.x > canvasWidth + 50 || 
+                enemy.y < -50 || enemy.y > canvasHeight + 50) {
+              enemies.splice(i, 1);
+            }
+          }
+        }
+      }
+
+      updateEnemy3() {
+        const currentTime = performance.now();
+        
+        for (let i = this.enemy3.length - 1; i >= 0; i--) {
+          const enemy = this.enemy3[i];
+          const timeSinceSpawn = currentTime - enemy.spawnTime;
+
+          if (enemy.warningPhase) {
+            const blinkInterval = 100;
+            if (currentTime - enemy.lastBlinkTime > blinkInterval) {
+              enemy.blinkState = !enemy.blinkState;
+              enemy.lastBlinkTime = currentTime;
+            }
+          }
+
+          if (timeSinceSpawn >= enemy.transformationTime && enemy.warningPhase) {
+            enemy.warningPhase = false;
+            enemy.isDeadly = true;
+          }
+
+          if (timeSinceSpawn >= enemy.lifetime) {
+            this.enemy3.splice(i, 1);
+            continue;
+          }
+        }
+      }
+
+      checkCollisions(player) {
+        const checkGroup = (enemies) => {
+          return enemies.some(enemy => {
+            const distance = Math.hypot(player.x - enemy.x, player.y - enemy.y);
+            return distance < player.width / 2 + enemy.radius && !player.isDodging;
+          });
+        };
+
+        const checkEnemy3 = () => {
+          return this.enemy3.some(enemy => {
+            if (!enemy.isDeadly) return false;
+            const distance = Math.hypot(player.x - enemy.x, player.y - enemy.y);
+            return distance < player.width / 2 + enemy.radius && !player.isDodging;
+          });
+        };
+
+        const checkEnemy4 = () => {
+          if (!this.enemy4) return false;
+          
+          const inLeftDangerZone = player.x - player.width/2 < this.enemy4.width;
+          const inRightDangerZone = player.x + player.width/2 > canvas.width - this.enemy4.width;
+          const inTopDangerZone = player.y - player.height/2 < this.enemy4.height;
+          const inBottomDangerZone = player.y + player.height/2 > canvas.height - this.enemy4.height;
+          
+          return (inLeftDangerZone || inRightDangerZone || inTopDangerZone || inBottomDangerZone) && !player.isDodging;
+        };
+
+        return checkGroup(this.enemies) || checkGroup(this.enemy2) || checkEnemy3() || checkEnemy4();
+      }
+
+      draw(ctx) {
+        // Enemy4 (background)
+        if (this.enemy4) {
+          ctx.fillStyle = `rgba(255, 0, 0, ${this.enemy4.opacity})`;
+          
+          ctx.fillRect(0, 0, this.enemy4.width, ctx.canvas.height);
+          ctx.fillRect(ctx.canvas.width - this.enemy4.width, 0, this.enemy4.width, ctx.canvas.height);
+          ctx.fillRect(0, 0, ctx.canvas.width, this.enemy4.height);
+          ctx.fillRect(0, ctx.canvas.height - this.enemy4.height, ctx.canvas.width, this.enemy4.height);
+        }
+
+        // Regular enemies
+        [...this.enemies, ...this.enemy2].forEach(enemy => {
+          ctx.beginPath();
+          ctx.arc(enemy.x, enemy.y, enemy.radius, 0, Math.PI * 2);
+          ctx.fillStyle = 'red';
+          ctx.fill();
+          ctx.closePath();
+        });
+
+        // Enemy3
+        this.enemy3.forEach(enemy => {
+          ctx.beginPath();
+          ctx.arc(enemy.x, enemy.y, enemy.radius, 0, Math.PI * 2);
+          
+          if (enemy.warningPhase) {
+            if (enemy.blinkState) {
+              ctx.fillStyle = 'rgba(255, 200, 200, 0.15)';
+              ctx.fill();
+            }
+          } else {
+            ctx.fillStyle = 'rgba(255, 0, 0, 0.25)';
+            ctx.fill();
+          }
+          
+          ctx.closePath();
         });
       }
     }
 
-    const gameSettings = {
-      moveUp: localStorage.getItem('moveUp') || 'W',
-      moveDown: localStorage.getItem('moveDown') || 'S',
-      moveLeft: localStorage.getItem('moveLeft') || 'A',
-      moveRight: localStorage.getItem('moveRight') || 'D',
-      dodge: localStorage.getItem('dodge') || 'SHIFT'
-    };
+    // Game Class
+    class Game {
+      constructor() {
+        this.canvas = document.getElementById('gameCanvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.countdownEl = document.getElementById('countdown');
+        this.timerEl = document.getElementById('timer');
+        this.readyButton = document.getElementById('readyButton');
+        
+        this.audioManager = new AudioManager();
+        this.player = new Player(this.canvas.width, this.canvas.height);
+        this.waveManager = new WaveManager();
+        
+        this.timer = 0;
+        this.isGameRunning = false;
+        this.keysPressed = {};
+        
+        this.gameSettings = {
+          moveUp: localStorage.getItem('moveUp') || 'W',
+          moveDown: localStorage.getItem('moveDown') || 'S',
+          moveLeft: localStorage.getItem('moveLeft') || 'A',
+          moveRight: localStorage.getItem('moveRight') || 'D',
+          dodge: localStorage.getItem('dodge') || 'SHIFT'
+        };
 
-    let player = {
-      x: canvas.width / 2 - 10,
-      y: canvas.height / 2 - 10,
-      width: 20,
-      height: 20,
-      speed: 3,
-      color: '#4CAF50',
-      isDodging: false,
-      dodgeCooldown: false,
-      dodgeTimer: 0
-    };
-
-    let timer = 0;
-    let isGameRunning = false;
-    let keysPressed = {};
-    let waveManager = new WaveManager();
-
-    draw();
-
-    readyButton.addEventListener('click', () => {
-      readyButton.style.display = 'none';
-      countdownEl.style.display = 'block';
-      fadeIn(welcomeSong, 6);
-      startCountdown();
-    });
-
-    window.addEventListener('storage', (e) => {
-      if (e.key === 'musicVolume' || e.key === 'sfxVolume') {
-        updateVolumes();
+        this.initializeEventListeners();
+        this.draw();
       }
-    });
 
-    function startCountdown() {
-      let count = 5;
-      const countdownInterval = setInterval(() => {
-        countdownEl.textContent = count > 0 ? count : 'GO!';
-        if (count > 0) {
-          playSound(`voice_${count}`);
-        } else if (count === 0) {
-          playSound('voice_go');
-          clearInterval(countdownInterval);
-          countdownEl.style.display = 'none';
-          startGame();
+      initializeEventListeners() {
+        this.readyButton.addEventListener('click', () => this.onReadyClick());
+        window.addEventListener('storage', (e) => this.onStorageChange(e));
+        window.addEventListener('keydown', (e) => this.keysPressed[e.key.toUpperCase()] = true);
+        window.addEventListener('keyup', (e) => this.keysPressed[e.key.toUpperCase()] = false);
+      }
+
+      onReadyClick() {
+        this.readyButton.style.display = 'none';
+        this.countdownEl.style.display = 'block';
+        this.audioManager.fadeIn(6);
+        this.startCountdown();
+      }
+
+      onStorageChange(e) {
+        if (e.key === 'musicVolume' || e.key === 'sfxVolume') {
+          this.audioManager.updateVolumes();
         }
-        count--;
-      }, 1000);
-    }
+      }
 
-    function startGame() {
-      isGameRunning = true;
-      setInterval(() => {
-        if (isGameRunning) {
-          timer += 0.01;
-          timerEl.textContent = `${timer.toFixed(2)} s`;
+      startCountdown() {
+        let count = 5;
+        const countdownInterval = setInterval(() => {
+          this.countdownEl.textContent = count > 0 ? count : 'GO!';
+          if (count > 0) {
+            this.audioManager.playSound(`voice_${count}`);
+          } else if (count === 0) {
+            this.audioManager.playSound('voice_go');
+            clearInterval(countdownInterval);
+            this.countdownEl.style.display = 'none';
+            this.startGame();
+          }
+          count--;
+        }, 1000);
+      }
+
+      startGame() {
+        this.isGameRunning = true;
+        setInterval(() => {
+          if (this.isGameRunning) {
+            this.timer += 0.01;
+            this.timerEl.textContent = `${this.timer.toFixed(2)} s`;
+          }
+        }, 10);
+        this.gameLoop();
+      }
+
+      gameLoop() {
+        if (this.isGameRunning) {
+          this.player.update(this.keysPressed, this.gameSettings, this.canvas.width, this.canvas.height);
+          this.waveManager.update(this.timer, this.player, this.canvas.width, this.canvas.height);
+          
+          if (this.waveManager.checkCollisions(this.player)) {
+            this.gameOver();
+          }
+          
+          this.draw();
+          requestAnimationFrame(() => this.gameLoop());
         }
-      }, 10);
-      
-      gameLoop();
-    }
-
-    function updatePlayer() {
-      if (keysPressed[gameSettings.moveUp]) {
-        player.y -= player.speed;
-      }
-      if (keysPressed[gameSettings.moveDown]) {
-        player.y += player.speed;
-      }
-      if (keysPressed[gameSettings.moveLeft]) {
-        player.x -= player.speed;
-      }
-      if (keysPressed[gameSettings.moveRight]) {
-        player.x += player.speed;
       }
 
-      if (keysPressed[gameSettings.dodge] && !player.dodgeCooldown) {
-        player.isDodging = true;
-        player.color = 'rgba(255, 255, 255, 0.2)';
-        setTimeout(() => {
-          player.isDodging = false;
-          player.color = '#4CAF50';
-        }, 500);
-        player.dodgeCooldown = true;
-        setTimeout(() => player.dodgeCooldown = false, 10000);
+      draw() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.waveManager.draw(this.ctx);
+        this.player.draw(this.ctx);
+        this.drawArena();
       }
 
-      player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
-      player.y = Math.max(0, Math.min(canvas.height - player.height, player.y));
-    }
+      drawArena() {
+        this.ctx.strokeStyle = '#fff';
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeRect(0, 0, this.canvas.width, this.canvas.height);
+      }
 
-    function gameLoop() {
-      if (isGameRunning) {
-        updatePlayer();
-        waveManager.update(timer, player, canvas.width, canvas.height);
-        if (waveManager.checkCollisions(player)) {
-          gameOver();
-        }
-        draw();
-        requestAnimationFrame(gameLoop);
+      gameOver() {
+        this.isGameRunning = false;
+        this.audioManager.stopMusic();
+        window.location.href = `gameover.html?time=${this.timer.toFixed(2)}`;
       }
     }
 
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Player
-      ctx.fillStyle = player.color;
-      ctx.fillRect(player.x, player.y, player.width, player.height);
-
-
-      waveManager.draw(ctx);
-
-      // Arena
-      ctx.strokeStyle = '#fff';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(0, 0, canvas.width, canvas.height);
-    }
-
-    function gameOver() {
-      isGameRunning = false;
-      welcomeSong.pause();
-      welcomeSong.currentTime = 0;
-      window.location.href = `gameover.html?time=${timer.toFixed(2)}`;
-    }
-
-    window.addEventListener('keydown', (e) => {
-      keysPressed[e.key.toUpperCase()] = true;
+    // Inicializace hry
+    document.addEventListener('DOMContentLoaded', () => {
+      new Game();
     });
-
-    window.addEventListener('keyup', (e) => {
-      keysPressed[e.key.toUpperCase()] = false;
-    });
-
-    updateVolumes();
   </script>
 </body>
 </html>
