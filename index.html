@@ -38,10 +38,10 @@
       height: 400%;
       background: radial-gradient(
         circle at center,
-        #8B0000 5%,    /* Červená zabírá menší část ve středu */
-        #2B2B2B 20%,    /* Šedá začíná dříve a zabírá větší část */
-        #1a1a1a 60%,    /* Tmavší šedá pro plynulejší přechod */
-        #111111 70%     /* Téměř černá na okrajích */
+        #8B0000 5%,    
+        #2B2B2B 20%,   
+        #1a1a1a 60%,   
+        #111111 70%     
       );
       animation: lavaFlow 15s ease-in-out infinite;
       z-index: -2;
@@ -179,7 +179,6 @@
   <div class="container">
     <h1>EndlessDodge</h1>
     <button class="button" id="playButton">PLAY</button>
-    <button class="button" id="historyButton">History</button>
     <button class="button" id="recordsButton">Records</button>
     <button class="button" id="settingsButton">Settings</button>
   </div>
@@ -220,10 +219,6 @@
 
     document.getElementById('playButton').addEventListener('click', function() {
       window.location.href = 'play.html';
-    });
-
-    document.getElementById('historyButton').addEventListener('click', function() {
-      window.location.href = 'history.html';
     });
 
     document.getElementById('recordsButton').addEventListener('click', function() {

@@ -239,10 +239,10 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Pořadí</th>
+                        <th>Place</th>
                         <th>Nick</th>
-                        <th>Datum</th>
-                        <th>Čas přežití (s)</th>
+                        <th>Date</th>
+                        <th>Time (s)</th>
                     </tr>
                 </thead>
                 <tbody id="top3Records">
@@ -255,10 +255,10 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Pořadí</th>
+                        <th>Place</th>
                         <th>Nick</th>
-                        <th>Datum</th>
-                        <th>Čas přežití (s)</th>
+                        <th>Date</th>
+                        <th>Time (s)</th>
                     </tr>
                 </thead>
                 <tbody id="recordsList">
@@ -266,7 +266,7 @@
             </table>
         </div>
 
-        <button class="backButton" onclick="window.location.href='index.html'">Zpět na Hlavní Stránku</button>
+        <button class="backButton" onclick="window.location.href='index.html'">Back to main page</button>
     </div>
 
     <script src="storage.js"></script>
@@ -277,35 +277,36 @@
             // TOP 3
             const top3Table = document.getElementById('top3Records');
             top3Table.innerHTML = '';
-
+    
             records.slice(0, 3).forEach((record, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${index + 1}</td>
                     <td>${record.nickname}</td>
                     <td>${record.date}</td>
-                    <td>${record.time.toFixed(2)} sekund</td>
+                    <td>${record.time.toFixed(2)} seconds</td>
                 `;
                 top3Table.appendChild(row);
             });
-
+    
             // Ostatní rekordy (4-50)
             const recordsTable = document.getElementById('recordsList');
             recordsTable.innerHTML = '';
-
+    
             records.slice(3).forEach((record, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${index + 4}</td>
                     <td>${record.nickname}</td>
                     <td>${record.date}</td>
-                    <td>${record.time.toFixed(2)} sekund</td>
+                    <td>${record.time.toFixed(2)} seconds</td>
                 `;
                 recordsTable.appendChild(row);
             });
         }
-
+    
         window.onload = loadRecords;
     </script>
+    
 </body>
 </html>
