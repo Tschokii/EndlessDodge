@@ -69,15 +69,17 @@
 </head>
 <body>
   <div class="game-container">
-    <button id="readyButton" class="ready-button">Ready</button>
-    <div id="countdown" class="countdown">5</div>
-    <div id="timer" class="timer">0.00 s</div>
-    <canvas id="gameCanvas" width="800" height="800"></canvas>
+    <button id="readyButton" class="ready-button">Ready</button>    <!-- Ready -->
+    <div id="countdown" class="countdown">5</div>    <!-- Odpočítávání před začátkem hry -->
+    <div id="timer" class="timer">0.00 s</div>  <!-- Zobrazení herního času -->
+    <canvas id="gameCanvas" width="800" height="800"></canvas>  <!-- Plátno pro vykreslování hry -->
   </div>
 
   <script src="storage.js"></script>
   <script>
+     // Třída pro hráče ve hře
     class Player {
+      // Nastavení počáteční polohy hráče (střed canvasu) + velikost, rychlost, barva atd.. hráče
       constructor(canvasWidth, canvasHeight) {
         this.x = canvasWidth / 2 - 10;
         this.y = canvasHeight / 2 - 10;
@@ -85,11 +87,11 @@
         this.height = 20;
         this.speed = 3;
         this.color = '#4CAF50';
-        this.isDodging = false;
-        this.dodgeCooldown = false;
+        this.isDodging = false; // Stav úhybu
+        this.dodgeCooldown = false; // Cooldown po úhybu
         this.dodgeTimer = 0;
       }
-
+      // Aktualizace pozice hráče na základě stisknutých kláves
       update(keysPressed, gameSettings, canvasWidth, canvasHeight) {
         if (keysPressed[gameSettings.moveUp]) {
           this.y -= this.speed;
@@ -103,33 +105,33 @@
         if (keysPressed[gameSettings.moveRight]) {
           this.x += this.speed;
         }
-
+        // Aktivace uhybu pokud není cooldown
         if (keysPressed[gameSettings.dodge] && !this.dodgeCooldown) {
           this.isDodging = true;
-          this.color = 'rgba(255, 255, 255, 0.2)';
+          this.color = 'rgba(255, 255, 255, 0.2)'; // Změna barvy během úhybu
           setTimeout(() => {
             this.isDodging = false;
-            this.color = '#4CAF50';
-          }, 9999999);
+            this.color = '#4CAF50'; // vracení barvy
+          }, 500); // Délka úhybu
           this.dodgeCooldown = true;
-          setTimeout(() => this.dodgeCooldown = false, 10000);
+          setTimeout(() => this.dodgeCooldown = false, 10000); // Cooldown 10 sekund
         }
-
+        //  hráč zůstane v canvasu
         this.x = Math.max(0, Math.min(canvasWidth - this.width, this.x));
         this.y = Math.max(0, Math.min(canvasHeight - this.height, this.y));
       }
-
+      // Vykreslení hráče na canvas
       draw(ctx) {
-        ctx.fillStyle = this.color;
-        ctx.fillRect(this.x, this.y, this.width, this.height);
+        ctx.fillStyle = this.color; // barva
+        ctx.fillRect(this.x, this.y, this.width, this.height); // obdelník
       }
     }
-
+    // Třída pro správu zvuků a hudby
     class AudioManager {
       constructor() {
-        this.welcomeSong = new Audio('./WelcomeSong.mp3');
+        this.welcomeSong = new Audio('./WelcomeSong.mp3'); // hudba v pozadí
         this.welcomeSong.loop = true;
-
+        // Nastavení zvuků pro odpočet
         this.sounds = {
           voice_5: new Audio('./voice_5.mp3'),
           voice_4: new Audio('./voice_4.mp3'),
@@ -138,23 +140,23 @@
           voice_1: new Audio('./voice_1.mp3'),
           voice_go: new Audio('./voice_go.mp3'),
         };
-
+        // Načtení hlasitosti z localStorage (výchozí hodnota 50)
         this.musicVolume = localStorage.getItem('musicVolume') || 50;
         this.sfxVolume = localStorage.getItem('sfxVolume') || 50;
         this.updateVolumes();
       }
-
+      // Normalizace hlasitosti na hodnotu mezi 0 a 1
       normalizeVolume(volume) {
         return volume / 100;
       }
-
+      // Postupné zvyšování hlasitosti (fade-in) u hudby v pozadí
       fadeIn(audio, duration) {
-        audio.volume = 0;
+        audio.volume = 0; // hlasitost začíná od 0
         audio.play();
         
         const increment = this.normalizeVolume(this.musicVolume) / (duration * 60);
         let currentVolume = 0;
-        
+         // Zvyšování hlasitosti v malých krocích
         const fadeInterval = setInterval(() => {
           currentVolume += increment;
           if (currentVolume >= this.normalizeVolume(this.musicVolume)) {
@@ -165,7 +167,7 @@
           }
         }, 1000 / 60);
       }
-
+      // Aktualizace hlasitostí pro hudbu a efekty
       updateVolumes() {
         this.musicVolume = localStorage.getItem('musicVolume') || 50;
         this.sfxVolume = localStorage.getItem('sfxVolume') || 50;
@@ -176,7 +178,7 @@
           sound.volume = this.normalizeVolume(this.sfxVolume);
         });
       }
-
+      // Přehrání zvuku
       playSound(soundName) {
         if (this.sounds[soundName]) {
           this.sounds[soundName].currentTime = 0;
@@ -186,30 +188,30 @@
           });
         }
       }
-
+      // Zastavení hudby v pozadí
       stopWelcomeSong() {
         this.welcomeSong.pause();
         this.welcomeSong.currentTime = 0;
       }
     }
-
+    // game třída
     class Game {
-      constructor() {
+      constructor() {   // Připojení canvas elementu a získání 2D kontextu pro vykreslování
         this.canvas = document.getElementById('gameCanvas');
         this.ctx = this.canvas.getContext('2d');
-        this.countdownEl = document.getElementById('countdown');
+        this.countdownEl = document.getElementById('countdown'); // Odkazy na elementy pro odpočet, časovač a tlačítko "Ready"
         this.timerEl = document.getElementById('timer');
         this.readyButton = document.getElementById('readyButton');
-
-        this.player = new Player(this.canvas.width, this.canvas.height);
+        
+        this.player = new Player(this.canvas.width, this.canvas.height);   // Inicializace hráče, správy zvuků a správy vln nepřátel
         this.audioManager = new AudioManager();
         this.waveManager = new WaveManager(this.canvas);
 
-        this.timer = 0;
+        this.timer = 0; // Počáteční hodnoty časovače a stavu hry
         this.isGameRunning = false;
-        this.keysPressed = {};
+        this.keysPressed = {};  // Objekt sledující aktuálně stisknuté klávesy
 
-        this.gameSettings = {
+        this.gameSettings = { // Nastavení kláves pro ovládání z localStorage nebo výchozí hodnoty (WSAD)
           moveUp: localStorage.getItem('moveUp') || 'W',
           moveDown: localStorage.getItem('moveDown') || 'S',
           moveLeft: localStorage.getItem('moveLeft') || 'A',
@@ -218,119 +220,119 @@
         };
 
         this.initializeEventListeners();
-        this.draw();
+        this.draw();     // První vykreslení scény
       }
-      initializeEventListeners() {
+      initializeEventListeners() {  // Nastavení událostí pro tlačítka a klávesnici
         this.readyButton.addEventListener('click', () => {
           this.readyButton.style.display = 'none';
           this.countdownEl.style.display = 'block';
-          this.audioManager.fadeIn(this.audioManager.welcomeSong, 6);
-          this.startCountdown();
+          this.audioManager.fadeIn(this.audioManager.welcomeSong, 6); // fade in songu
+          this.startCountdown(); // odpočet
         });
 
-        window.addEventListener('storage', (e) => {
+        window.addEventListener('storage', (e) => { // Aktualizace hlasitosti při změně hodnot v localStorage
           if (e.key === 'musicVolume' || e.key === 'sfxVolume') {
             this.audioManager.updateVolumes();
           }
         });
-
-        window.addEventListener('keydown', (e) => {
+         // Zaznam stisknuté klávesy
+        window.addEventListener('keydown', (e) => { 
           this.keysPressed[e.key.toUpperCase()] = true;
         });
-
+        // Zaznam pusten klávesy
         window.addEventListener('keyup', (e) => {
           this.keysPressed[e.key.toUpperCase()] = false;
         });
       }
 
-      startCountdown() {
+      startCountdown() { // Spuštění odpočtu před startem hry
         let count = 5;
         const countdownInterval = setInterval(() => {
           this.countdownEl.textContent = count > 0 ? count : 'GO!';
           if (count > 0) {
-            this.audioManager.playSound(`voice_${count}`);
+            this.audioManager.playSound(`voice_${count}`); // přehrání zvuku k danemu cislu
           } else if (count === 0) {
-            this.audioManager.playSound('voice_go');
+            this.audioManager.playSound('voice_go'); // GO sound
             clearInterval(countdownInterval);
             this.countdownEl.style.display = 'none';
-            this.startGame();
+            this.startGame(); // Spuštění hry
           }
           count--;
         }, 1000);
       }
-
+       // Zahájení hry
       startGame() {
         this.isGameRunning = true;
         setInterval(() => {
           if (this.isGameRunning) {
-            this.timer += 0.01;
-            this.timerEl.textContent = `${this.timer.toFixed(2)} s`;
+            this.timer += 0.01; // Aktualizace herního času
+            this.timerEl.textContent = `${this.timer.toFixed(2)} s`; // Zobrazení času
           }
-        }, 10);
+        }, 10); // Interval aktualizace 10 ms
         
-        this.gameLoop();
+        this.gameLoop(); 
       }
-
+       // Hlavní herní smyčka
       gameLoop() {
         if (this.isGameRunning) {
-          this.player.update(this.keysPressed, this.gameSettings, this.canvas.width, this.canvas.height);
-          this.waveManager.update(this.timer, this.player, this.canvas.width, this.canvas.height);
-          if (this.waveManager.checkCollisions(this.player)) {
-            this.gameOver();
+          this.player.update(this.keysPressed, this.gameSettings, this.canvas.width, this.canvas.height);    // Aktualizace stavu hráče
+          this.waveManager.update(this.timer, this.player, this.canvas.width, this.canvas.height);  // Aktualizace vln nepřátel
+          if (this.waveManager.checkCollisions(this.player)) { // Kontrola kolizí mezi hráčem a nepřáteli
+            this.gameOver(); // Konec hry při kolizi
           }
           this.draw();
-          requestAnimationFrame(() => this.gameLoop());
+          requestAnimationFrame(() => this.gameLoop()); // Rekurzivní volání smyčky
         }
       }
 
       draw() {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.player.draw(this.ctx);
-        this.waveManager.draw(this.ctx);
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); // Vyčištění canvasu
+        this.player.draw(this.ctx); // Vykreslení hráče
+        this.waveManager.draw(this.ctx);  // Vykreslení nepřátel (vln)
 
-        // Arena
+        // Arena hranice
         this.ctx.strokeStyle = '#fff';
         this.ctx.lineWidth = 2;
         this.ctx.strokeRect(0, 0, this.canvas.width, this.canvas.height);
       }
-
+      // Konec hry
       gameOver() {
         this.isGameRunning = false;
-        this.audioManager.stopWelcomeSong();
-        window.location.href = `gameover.html?time=${this.timer.toFixed(2)}`;
+        this.audioManager.stopWelcomeSong(); // Zastavení hudby a hry
+        window.location.href = `gameover.html?time=${this.timer.toFixed(2)}`;   // Přesměrování na stránku "Game Over" s časem 
       }
     }
 
     class WaveManager {
   constructor(canvas) {
     this.canvas = canvas;
-    this.enemies = [];
+    this.enemies = []; // Pole pro uchovávání nepratel
     this.enemy2 = [];
     this.enemy3 = [];
     this.enemy4 = null;
     this.currentWave = 0;
     this.nextWaveTime = 0;
-    this.waveDuration = 1;
-    this.startTime = 3.3;
-    this.enemy2StartTime = 13.0;
-    this.enemy3StartTime = 32.0;
-    this.enemy4StartTime = 51.0;
-    this.enemy2Started = false;
+    this.waveDuration = 1; // Délka jedné vlny
+    this.startTime = 3.3; // Čas, kdy se začne objevovat první nepřítel
+    this.enemy2StartTime = 13.0; // Druhy nepřítel
+    this.enemy3StartTime = 32.0; // Třetí
+    this.enemy4StartTime = 51.0; // 4
+    this.enemy2Started = false;  // Kontrola jestli byl spusten
     this.enemy3Started = false;
     this.enemy4Started = false;
-    this.minimumDistance = 100;
-    this.maxEnemies = 3;
-    this.maxEnemiesAfterThreshold = 5;
+    this.minimumDistance = 100; // Minimální vzdálenost mezi nepřáteli pro jejich generování
+    this.maxEnemies = 3; // Max počet nepřátel pro první vlne
+    this.maxEnemiesAfterThreshold = 5; // Max pocet po urcitem case
     this.maxEnemy3 = 1;
     this.enemy3SpawnInterval = 1;
     this.lastEnemy3SpawnTime = 0;
-    this.thresholdTime = 23.8;
+    this.thresholdTime = 23.8; // Čas kdy se změní počet nepřátel ve vlne
     this.shouldSpawnNewWave = true;
-    this.pauseStartTime = 32.0;
+    this.pauseStartTime = 32.0; 
     this.pauseEndTime = 42.0;
     this.isEnemySpawningPaused = false;
   }
-
+  // Metoda pro získání náhodných pozic na ose X pro vertikální spawnování nepřátel
   getSpawnPositionsVertical(canvasWidth, count) {
     const positions = [];
     const sectionWidth = canvasWidth / count;
@@ -345,7 +347,7 @@
     
     return positions.sort(() => Math.random() - 0.5);
   }
-
+  // Metoda pro získání náhodných pozic na ose Y pro horizontální spawnování nepřátel
   getSpawnPositionsHorizontal(canvasHeight, count) {
     const positions = [];
     const sectionHeight = canvasHeight / count;
@@ -360,12 +362,12 @@
     
     return positions.sort(() => Math.random() - 0.5);
   }
-
+   // Metoda pro vytvoření prvního typu nepřítele
   createEnemy(x, canvasHeight) {
-    const radius = 10;
-    const spawnFromTop = Math.random() < 0.5;
+    const radius = 10; // Velikost
+    const spawnFromTop = Math.random() < 0.5; // Náhodně zvolí jestli se nepřítel objeví z vrchu nebo zespodu
     const y = spawnFromTop ? -radius : canvasHeight + radius;
-    const angle = spawnFromTop ? Math.PI / 2 : -Math.PI / 2;
+    const angle = spawnFromTop ? Math.PI / 2 : -Math.PI / 2; // Směr pohybu
 
     return {
       x,
@@ -376,7 +378,7 @@
       active: true,
     };
   }
-
+  // Metoda pro vytvoření 2 typu nepřítele
   createEnemy2(y, canvasWidth) {
     const radius = 10;
     const spawnFromLeft = Math.random() < 0.5;
@@ -392,17 +394,17 @@
       active: true,
     };
   }
-
+  // Metoda pro vytvoření 3 typu nepřítele
   createEnemy3(canvasWidth, canvasHeight, player) {
     const radius = 50;
     let x, y;
 
     if (player) {
       const offset = 10;
-      x = player.x + Math.random() * offset * 2 - offset;
+      x = player.x + Math.random() * offset * 2 - offset; // spwan kde se nachází hráč
       y = player.y + Math.random() * offset * 2 - offset;
 
-      x = Math.max(radius, Math.min(canvasWidth - radius, x));
+      x = Math.max(radius, Math.min(canvasWidth - radius, x)); // Omezí pozici aby nepřítel nevyšel za okraje
       y = Math.max(radius, Math.min(canvasHeight - radius, y));
     } else {
       x = radius + Math.random() * (canvasWidth - 2 * radius);
@@ -414,18 +416,18 @@
       y,
       radius,
       active: true,
-      spawnTime: performance.now(),
-      isDeadly: false,
-      warningPhase: true,
-      transformationTime: 2000,
-      deadlyDuration: 1000,
+      spawnTime: performance.now(), // Čas kdy se nepřítel objevil
+      isDeadly: false, // je nepřítel smrtelný
+      warningPhase: true, // je fáze blikani (nepřítel bliká)
+      transformationTime: 2000, // Čas pro zmenu na smrteleneho
+      deadlyDuration: 1000, // Doba kdy je smrtleny
       opacity: 0.3,
       lastBlinkTime: performance.now(),
       blinkState: true,
-      lifetime: 3000
+      lifetime: 3000 // Doba zivota nepritele
     };
   }
-
+  // 4 nepřítel
   createEnemy4(canvasWidth, canvasHeight) {
     return {
       width: 50,
@@ -433,30 +435,30 @@
       maxWidth: 200,
       maxHeight: 200,
       growing: true,
-      growthSpeed: 0.2,
-      opacity: 0.5,
+      growthSpeed: 0.2, // Rychlost růstu
+      opacity: 0.5, // Počáteční průhlednost
     };
   }
-
+  // Metoda pro generování vlny prvního typu nepřátel
   spawnEnemyWave(canvasWidth, canvasHeight, count) {
     const spawnPositions = this.getSpawnPositionsVertical(canvasWidth, count);
     return spawnPositions.map(x => this.createEnemy(x, canvasHeight));
   }
-
+  // Metoda pro generování vlny druhého typu nepřátel
   spawnEnemy2Wave(canvasWidth, canvasHeight, count) {
     const spawnPositions = this.getSpawnPositionsHorizontal(canvasHeight, count);
     return spawnPositions.map(y => this.createEnemy2(y, canvasWidth));
   }
-
+  // Hlavní metoda pro aktualizaci stavu nepřátel
   update(timer, player, canvasWidth, canvasHeight) {
-    // Update enemy4 first
+    // stav čtvrtého nepřítele
     if (timer >= this.enemy4StartTime) {
       if (!this.enemy4Started) {
         this.enemy4Started = true;
         this.enemy4 = this.createEnemy4(canvasWidth, canvasHeight);
       }
 
-      if (this.enemy4) {
+      if (this.enemy4) { // Růst nepřítele
         if (this.enemy4.growing) {
           this.enemy4.width += this.enemy4.growthSpeed;
           this.enemy4.height += this.enemy4.growthSpeed;
@@ -464,7 +466,7 @@
               this.enemy4.height >= this.enemy4.maxHeight) {
             this.enemy4.growing = false;
           }
-        } else {
+        } else {   // Zpětný růst
           this.enemy4.width -= this.enemy4.growthSpeed;
           this.enemy4.height -= this.enemy4.growthSpeed;
           if (this.enemy4.width <= 50 || this.enemy4.height <= 50) {
@@ -474,32 +476,32 @@
       }
     }
 
-    if (timer >= this.pauseStartTime && timer < this.pauseEndTime) {
-      this.isEnemySpawningPaused = true;
-      this.enemies = [];
+    if (timer >= this.pauseStartTime && timer < this.pauseEndTime) {  // Určity čas stopne enemy (puaza)
+      this.isEnemySpawningPaused = true; // Pozastaví spawnování nepřátel
+      this.enemies = []; // Vyprázdní seznam 1 a 2 typu nepřátel
       this.enemy2 = [];
     } else {
-      this.isEnemySpawningPaused = false;
+      this.isEnemySpawningPaused = false; // Obnoví spawnování nepřátel po pauze
     }
 
     if (timer >= this.nextWaveTime && !this.isEnemySpawningPaused) {
-      this.currentWave++;
-      this.nextWaveTime = timer + this.waveDuration;
+      this.currentWave++; // Zvýší číslo aktuální vlny pokud je urcity čas
+      this.nextWaveTime = timer + this.waveDuration; // Nastaví čas pro příští vlnu
 
       const maxCount = timer >= this.thresholdTime ? this.maxEnemiesAfterThreshold : this.maxEnemies;
-
+  // Zvolí maximální počet nepřátel na základě času, zda je překročen prahový čas
       if (timer >= this.startTime && timer < this.enemy2StartTime) {
-        if (this.enemies.length === 0 && this.shouldSpawnNewWave) {
+        if (this.enemies.length === 0 && this.shouldSpawnNewWave) { // Vygeneruje první vlnu nepřátel
           this.enemies = this.spawnEnemyWave(canvasWidth, canvasHeight, maxCount);
-          this.shouldSpawnNewWave = false;
+          this.shouldSpawnNewWave = false; // Zajistí, že nová vlna se spustí pouze jednou
         }
       } else if (timer >= this.enemy2StartTime) {
         if (!this.enemy2Started) {
-          this.enemy2Started = true;
+          this.enemy2Started = true; // Označí, že druhý typ nepřátel byl spuštěn
         }
         
         if (this.enemies.length === 0 && this.enemy2.length === 0 && this.shouldSpawnNewWave) {
-          this.enemies = this.spawnEnemyWave(canvasWidth, canvasHeight, maxCount);
+          this.enemies = this.spawnEnemyWave(canvasWidth, canvasHeight, maxCount); // první vlna se generuje
           this.enemy2 = this.spawnEnemy2Wave(canvasWidth, canvasHeight, maxCount);
           this.shouldSpawnNewWave = false;
         }
@@ -538,15 +540,15 @@
 
   updateEnemies(enemies, canvasWidth, canvasHeight) {
     for (let i = enemies.length - 1; i >= 0; i--) {
-      const enemy = enemies[i];
-      if (enemy.active) {
+      const enemy = enemies[i];    // Pokud je nepřítel aktivní
+      if (enemy.active) { // Aktualizace pozice nepřítele podle úhlu a rychlosti
         enemy.x += Math.cos(enemy.angle) * enemy.speed;
         enemy.y += Math.sin(enemy.angle) * enemy.speed;
-        enemy.speed += 0.001;
-
+        enemy.speed += 0.001; // Zvyšování rychlosti nepřítele
+// Kontrola, jestli nepřítel vyšel z plátna
         if (enemy.x < -50 || enemy.x > canvasWidth + 50 || 
             enemy.y < -50 || enemy.y > canvasHeight + 50) {
-          enemies.splice(i, 1);
+          enemies.splice(i, 1); // Pokud je mimo plátno, odstranit ho ze seznamu
         }
       }
     }
@@ -558,20 +560,20 @@
     for (let i = this.enemy3.length - 1; i >= 0; i--) {
       const enemy = this.enemy3[i];
       const timeSinceSpawn = currentTime - enemy.spawnTime;
-
+// Fáze varování - blikání
       if (enemy.warningPhase) {
-        const blinkInterval = 100;
+        const blinkInterval = 100; // Interval pro blikání
         if (currentTime - enemy.lastBlinkTime > blinkInterval) {
           enemy.blinkState = !enemy.blinkState;
-          enemy.lastBlinkTime = currentTime;
+          enemy.lastBlinkTime = currentTime; // Aktualizuje čas posledního blikání
         }
       }
-
+// Pokud uplynul čas transformace přepne nepřítele na smrtelnýho modu
       if (timeSinceSpawn >= enemy.transformationTime && enemy.warningPhase) {
         enemy.warningPhase = false;
         enemy.isDeadly = true;
       }
-
+// Pokud uplynula doba životnosti odstraní nepřítele
       if (timeSinceSpawn >= enemy.lifetime) {
         this.enemy3.splice(i, 1);
         continue;
@@ -579,15 +581,15 @@
     }
   }
 
-  checkCollisions(player) {
-    const checkGroup = (enemies) => {
+  checkCollisions(player) { // Funkce pro kontrolu kolizí s různými skupinami nepřátel
+    const checkGroup = (enemies) => { // Kontrola kolize s danou skupinou nepřátel
       return enemies.some(enemy => {
-        const distance = Math.hypot(player.x - enemy.x, player.y - enemy.y);
+        const distance = Math.hypot(player.x - enemy.x, player.y - enemy.y); // Pokud je vzdálenost mezi hráčem a nepřítelem menší než jejich součet poloměrů
         return distance < player.width / 2 + enemy.radius && !player.isDodging;
       });
     };
 
-    const checkEnemy3 = () => {
+    const checkEnemy3 = () => {  // Kontrola kolize s nepřítelem č.3 který je smrtelný
       return this.enemy3.some(enemy => {
         if (!enemy.isDeadly) return false;
         const distance = Math.hypot(player.x - enemy.x, player.y - enemy.y);
@@ -597,7 +599,7 @@
 
     const checkEnemy4 = () => {
       if (!this.enemy4) return false;
-      
+      // Kontrola, zda hráč vstoupil do "nebezpečné zóny" okraje plátna
       const inLeftDangerZone = player.x - player.width/2 < this.enemy4.width;
       const inRightDangerZone = player.x + player.width/2 > this.canvas.width - this.enemy4.width;
       const inTopDangerZone = player.y - player.height/2 < this.enemy4.height;
@@ -605,39 +607,39 @@
       
       return (inLeftDangerZone || inRightDangerZone || inTopDangerZone || inBottomDangerZone) && !player.isDodging;
     };
-
+    // Kontroluje kolize s každou skupinou nepřátel
     return checkGroup(this.enemies) || checkGroup(this.enemy2) || checkEnemy3() || checkEnemy4();
   }
 
-  draw(ctx) {
+  draw(ctx) { // Pokud existuje nepřítel 4. typu vykreslí jeho "nebezpečnou zónu"
     if (this.enemy4) {
       ctx.fillStyle = `rgba(255, 0, 0, ${this.enemy4.opacity})`;
-      
+      // Kreslení okrajových nebezpečných zón na plátně
       ctx.fillRect(0, 0, this.enemy4.width, ctx.canvas.height);
       ctx.fillRect(ctx.canvas.width - this.enemy4.width, 0, this.enemy4.width, ctx.canvas.height);
       
       ctx.fillRect(0, 0, ctx.canvas.width, this.enemy4.height);
       ctx.fillRect(0, ctx.canvas.height - this.enemy4.height, ctx.canvas.width, this.enemy4.height);
     }
-
+ // Kreslení nepřátel 1 a 2
     [...this.enemies, ...this.enemy2].forEach(enemy => {
       ctx.beginPath();
-      ctx.arc(enemy.x, enemy.y, enemy.radius, 0, Math.PI * 2);
+      ctx.arc(enemy.x, enemy.y, enemy.radius, 0, Math.PI * 2); // Kreslí kruh pro každého nepřítele
       ctx.fillStyle = 'red';
       ctx.fill();
       ctx.closePath();
     });
-
+  // Kreslení nepřátel 3. typu
     this.enemy3.forEach(enemy => {
       ctx.beginPath();
-      ctx.arc(enemy.x, enemy.y, enemy.radius, 0, Math.PI * 2);
+      ctx.arc(enemy.x, enemy.y, enemy.radius, 0, Math.PI * 2); // Kreslí kruh pro každého nepřítele č.3
       
       if (enemy.warningPhase) {
-        if (enemy.blinkState) {
+        if (enemy.blinkState) { // Blikání během fáze varování
           ctx.fillStyle = 'rgba(255, 200, 200, 0.15)';
           ctx.fill();
         }
-      } else {
+      } else {  // Po fázi varování, červený poloprůhledný nepřítel
         ctx.fillStyle = 'rgba(255, 0, 0, 0.25)';
         ctx.fill();
       }
