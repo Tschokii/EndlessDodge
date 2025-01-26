@@ -5,98 +5,130 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EndlessDodge - Game Over</title>
     <style>
+        /* Základní nastavení pro celou stránku */
         body {
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
-            background-color: #222;
-            color: #fff;
-            display: flex;
-            justify-content: center;
+            background-color: #222;          
+            color: #fff;                     
+            display: flex;                  
+            justify-content: center;         
             align-items: center;
-            height: 100vh;
+            height: 100vh;                   
             flex-direction: column;
         }
+
+        /* Kontejner pro obsah Game Over obrazovky */
         .game-over {
             text-align: center;
             padding: 2rem;
         }
+
+        /* Stylování hlavního nadpisu "Game Over" */
         h1 {
             font-size: 4rem;
             margin-bottom: 1rem;
-            color: #ff3333;
+            color: #ff3333;                  
         }
+
+        /* Stylování zobrazení času */
         .time {
             font-size: 2rem;
             margin-bottom: 2rem;
         }
+
+        /* Stylování informace o novém rekordu */
         .record-info {
-            color: #4CAF50;
+            color: #4CAF50;                  /* Zelený text pro pozitivní zprávu */
             font-size: 1.5rem;
             margin-bottom: 1rem;
-            display: none;
+            display: none;                   /* Výchozí stav je skrytý */
         }
+
+        /* Stylování vstupního pole pro přezdívku */
         input {
             padding: 0.5rem;
             font-size: 1.2rem;
             margin-bottom: 1rem;
-            background: #333;
+            background: #333;                
             border: 2px solid #fff;
             color: #fff;
             width: 200px;
         }
+
+        /* Stylování tlačítek */
         button {
             padding: 0.5rem 1rem;
             font-size: 1.2rem;
-            background: #4CAF50;
+            background: #4CAF50;             
             border: none;
             color: #fff;
             cursor: pointer;
             margin: 0.5rem;
         }
+
+        /* Efekt při najetí na tlačítko */
         button:hover {
-            background: #45a049;
+            background: #45a049;             
         }
     </style>
 </head>
 <body>
+    <!-- Hlavní kontejner pro Game Over obrazovku -->
     <div class="game-over">
         <h1>Game Over</h1>
+        <!-- Zobrazení času přežití -->
         <div class="time">Čas přežití: <span id="survivalTime">0.00</span> s</div>
+        <!-- Element pro zobrazení informace o rekordu (zpočátku skrytý) -->
         <div id="newRecord" class="record-info"></div>
+        <!-- Vstupní pole pro zadání přezdívky -->
         <input type="text" id="nickname" placeholder="Zadejte přezdívku" maxlength="20">
         <br>
+        <!-- Tlačítka pro uložení a návrat -->
         <button onclick="saveScore()">Uložit skóre</button>
         <button onclick="window.location.href='index.html'">Hlavní menu</button>
     </div>
 
+    <!-- Načtení externího skriptu pro práci s úložištěm -->
     <script src="storage.js"></script>
     <script>
+        // Získání času přežití z URL parametrů
         const urlParams = new URLSearchParams(window.location.search);
         const survivalTime = urlParams.get('time');
         
+        // Nastavení času do příslušného elementu
         document.getElementById('survivalTime').textContent = survivalTime;
 
+        // Funkce pro uložení skóre
         function saveScore() {
+            // Získání a ořezání přezdívky
             const nickname = document.getElementById('nickname').value.trim();
+            
+            // Kontrola, zda byla zadána přezdívka
             if (!nickname) {
                 alert('Prosím zadejte přezdívku');
                 return;
             }
 
+            // Získání aktuálního data
             const currentDate = new Date().toLocaleDateString();
+            
+            // Přidání rekordu do úložiště a kontrola, zda jde o nový rekord
             const isNewRecord = gameStorage.addRecord(nickname, survivalTime, currentDate);
 
+            // Získání elementu pro zobrazení informace o rekordu
             const recordInfo = document.getElementById('newRecord');
             recordInfo.style.display = 'block';
 
+            // Zobrazení příslušné zprávy podle toho, zda jde o nový rekord
             if (isNewRecord) {
                 recordInfo.textContent = 'New Personal Record!';
             } else {
                 recordInfo.textContent = 'Score Saved!';
             }
 
-            // Zakázat input a tlačítko po uložení
+            // Deaktivace inputu a tlačítka po uložení
             document.getElementById('nickname').disabled = true;
             document.querySelector('button').disabled = true;
         }

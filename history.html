@@ -3,268 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>History - EndlessDodge</title>
+    <title>EndlessDodge - Game Over</title>
     <style>
-        @font-face {
-            font-family: 'Kosmos';
-            src: url('kosmos.ttf') format('truetype');
-        }
-
-        * {
+        /* Základní nastavení pro celou stránku */
+        body {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+            background-color: #222;         
+            color: #fff;                     
+            display: flex;                
+            justify-content: center;       
+            align-items: center;            
+            height: 100vh;                  
+            flex-direction: column;          
         }
 
-        body {
-            font-family: 'Arial', sans-serif;  /* Changed default font */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background: #000;
-            overflow: hidden;
-            color: #fff;
-            position: relative;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: -150%;
-            left: -150%;
-            width: 400%;
-            height: 400%;
-            background: radial-gradient(
-                circle at center,
-                #8B0000 5%,
-                #2B2B2B 20%,
-                #1a1a1a 60%,
-                #111111 70%
-            );
-            animation: lavaFlow 15s ease-in-out infinite;
-            z-index: -2;
-            opacity: 0.7;
-            transform-origin: center center;
-        }
-
-        @keyframes lavaFlow {
-            0% { transform: rotate(0deg) scale(1); }
-            50% { transform: rotate(180deg) scale(1.2); }
-            100% { transform: rotate(360deg) scale(1); }
-        }
-
-        .container {
-            width: 90%;
-            max-width: 800px;
-            margin: 30px auto;
+        /* Kontejner pro obsah Game Over obrazovky */
+        .game-over {
             text-align: center;
             padding: 2rem;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            box-shadow: 0 0 30px rgba(139, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            animation: containerPulse 3s ease-in-out infinite;
-            position: relative;
-            z-index: 1;
         }
 
-        @keyframes containerPulse {
-            0%, 100% { box-shadow: 0 0 30px rgba(139, 0, 0, 0.3); }
-            50% { box-shadow: 0 0 50px rgba(139, 0, 0, 0.5); }
-        }
-
+        /* Stylování hlavního nadpisu "Game Over" */
         h1 {
-            font-family: 'Kosmos', Arial, sans-serif;  /* Keep Kosmos font for main title */
-            font-size: 3rem;
-            margin-bottom: 2rem;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            color: #fff;
-            text-shadow: 
-                3px 3px 0 #8B0000,
-                -1px -1px 0 #8B0000,
-                1px -1px 0 #8B0000,
-                -1px 1px 0 #8B0000,
-                1px 1px 0 #8B0000;
-            animation: titleGlow 3s ease-in-out infinite;
-        }
-
-        @keyframes titleGlow {
-            0%, 100% { filter: brightness(1); }
-            50% { filter: brightness(1.3); }
-        }
-
-        .record {
-            margin: 20px 0;
-            padding: 20px;
-            background: rgba(139, 0, 0, 0.3);
-            border-radius: 10px;
-            font-size: 1.2rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            animation: recordPulse 2s ease-in-out infinite;
-        }
-
-        @keyframes recordPulse {
-            0%, 100% { background: rgba(139, 0, 0, 0.3); }
-            50% { background: rgba(139, 0, 0, 0.5); }
-        }
-
-        h2 {
-            font-family: 'Kosmos', Arial, sans-serif;  /* Keep Kosmos font for section title */
-            font-size: 1.8rem;
+            font-size: 4rem;
             margin-bottom: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            text-shadow: 2px 2px 0 #000;
+            color: #ff3333;                 
         }
 
-        .table-container {
-            max-height: 400px;  /* Added fixed height for scrolling */
-            overflow-y: auto;   /* Added vertical scrolling */
-            margin-top: 30px;
-            border-radius: 10px;
-            background: rgba(0, 0, 0, 0.3);
+        /* Stylování zobrazení času */
+        .time {
+            font-size: 2rem;
+            margin-bottom: 2rem;
         }
 
-        table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
+        /* Stylování informace o novém rekordu */
+        .record-info {
+            color: #4CAF50;                 
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            display: none;                  
         }
 
-        th, td {
-            padding: 15px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        th {
-            background: linear-gradient(45deg, #2B2B2B, #8B0000);
-            color: white;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            font-weight: bold;
-            text-shadow: 1px 1px 0 #000;
-            position: sticky;  /* Make headers stick to top */
-            top: 0;
-            z-index: 1;
-        }
-
-        tr:nth-child(even) {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        tr:hover {
-            background: rgba(139, 0, 0, 0.2);
-        }
-
-        .backButton {
-            display: inline-block;
-            margin: 2rem 0.5rem;
-            padding: 1rem 2rem;
+        /* Stylování vstupního pole pro přezdívku */
+        input {
+            padding: 0.5rem;
             font-size: 1.2rem;
-            font-family: 'Arial', sans-serif;  /* Changed to Arial for better readability */
-            background: linear-gradient(45deg, #2B2B2B, #8B0000);
-            color: white;
+            margin-bottom: 1rem;
+            background: #333;              
             border: 2px solid #fff;
-            border-radius: 10px;
+            color: #fff;
+            width: 200px;
+        }
+
+        /* Stylování tlačítek */
+        button {
+            padding: 0.5rem 1rem;
+            font-size: 1.2rem;
+            background: #4CAF50;            
+            border: none;
+            color: #fff;
             cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            position: relative;
-            overflow: hidden;
-            letter-spacing: 0.1em;
-            text-shadow: 1px 1px 0 #000;
-            animation: borderGlow 2s ease-in-out infinite;
+            margin: 0.5rem;
         }
 
-        /* Scrollbar styling */
-        .table-container::-webkit-scrollbar {
-            width: 10px;
-        }
-
-        .table-container::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 5px;
-        }
-
-        .table-container::-webkit-scrollbar-thumb {
-            background: rgba(139, 0, 0, 0.5);
-            border-radius: 5px;
-        }
-
-        .table-container::-webkit-scrollbar-thumb:hover {
-            background: rgba(139, 0, 0, 0.7);
+        /* Efekt při najetí na tlačítko */
+        button:hover {
+            background: #45a049;             
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>History of your games</h1>
-
-        <div id="bestRecord" class="record">
-            <h2>Best record</h2>
-            <p id="recordNick">Loading...</p>
-            <p id="recordTime">Loading...</p>
-            <p id="recordDate">Loading...</p>
-        </div>
-
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                    </tr>
-                </thead>
-                <tbody id="historyTable">
-                    <!-- Záznamy se načtou zde -->
-                </tbody>
-            </table>
-        </div>
-
-        <button class="backButton" onclick="window.location.href='index.html'">Back to main page</button>
+    <!-- Hlavní kontejner pro Game Over obrazovku -->
+    <div class="game-over">
+        <h1>Game Over</h1>
+        <!-- Zobrazení času přežití -->
+        <div class="time">Čas přežití: <span id="survivalTime">0.00</span> s</div>
+        <!-- Element pro zobrazení informace o rekordu (zpočátku skrytý) -->
+        <div id="newRecord" class="record-info"></div>
+        <!-- Vstupní pole pro zadání přezdívky -->
+        <input type="text" id="nickname" placeholder="Zadejte přezdívku" maxlength="20">
+        <br>
+        <!-- Tlačítka pro uložení a návrat -->
+        <button onclick="saveScore()">Uložit skóre</button>
+        <button onclick="window.location.href='index.html'">Hlavní menu</button>
     </div>
 
+    <!-- Načtení externího skriptu pro práci s úložištěm -->
     <script src="storage.js"></script>
     <script>
-        function loadHistory() {
-            const records = gameStorage.getAllRecords();
-            
-            // Seřazení podle času (od nejvyššího)
-            records.sort((a, b) => b.time - a.time);
+        // Získání času přežití z URL parametrů
+        const urlParams = new URLSearchParams(window.location.search);
+        const survivalTime = urlParams.get('time');
+        
+        // Nastavení času do příslušného elementu
+        document.getElementById('survivalTime').textContent = survivalTime;
 
-            // Zobrazení nejlepšího rekordu
-            if (records.length > 0) {
-                const bestRecord = records[0];
-                document.getElementById('recordNick').innerText = bestRecord.nickname;
-                document.getElementById('recordTime').innerText = bestRecord.time.toFixed(2) + ' sekund';
-                document.getElementById('recordDate').innerText = bestRecord.date;
+        // Funkce pro uložení skóre
+        function saveScore() {
+            // Získání a ořezání přezdívky
+            const nickname = document.getElementById('nickname').value.trim();
+            
+            // Kontrola, zda byla zadána přezdívka
+            if (!nickname) {
+                alert('Prosím zadejte přezdívku');
+                return;
             }
 
-            // Načítání pouze posledních 10 záznamů do tabulky
-            const historyTable = document.getElementById('historyTable');
-            historyTable.innerHTML = '';
+            // Získání aktuálního data
+            const currentDate = new Date().toLocaleDateString();
+            
+            // Přidání rekordu do úložiště a kontrola, zda jde o nový rekord
+            const isNewRecord = gameStorage.addRecord(nickname, survivalTime, currentDate);
 
-            // Získání posledních 10 záznamů
-            const lastTenRecords = records.slice(0, 10);
+            // Získání elementu pro zobrazení informace o rekordu
+            const recordInfo = document.getElementById('newRecord');
+            recordInfo.style.display = 'block';
 
-            lastTenRecords.forEach(record => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${record.nickname}</td>
-                    <td>${record.date}</td>
-                    <td>${record.time.toFixed(2)} sekund</td>
-                `;
-                historyTable.appendChild(row);
-            });
+            // Zobrazení příslušné zprávy podle toho, zda jde o nový rekord
+            if (isNewRecord) {
+                recordInfo.textContent = 'New Personal Record!';
+            } else {
+                recordInfo.textContent = 'Score Saved!';
+            }
+
+            // Deaktivace inputu a tlačítka po uložení
+            document.getElementById('nickname').disabled = true;
+            document.querySelector('button').disabled = true;
         }
-
-        window.onload = loadHistory;
     </script>
 </body>
 </html>

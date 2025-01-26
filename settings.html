@@ -5,30 +5,34 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Settings - EndlessDodge</title>
   <style>
+    /* Načtení vlastního fontu pro nadpisy */
     @font-face {
       font-family: 'Kosmos';
       src: url('kosmos.ttf') format('truetype');
     }
 
+    /* Reset základních CSS vlastností */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
+    /* Hlavní styly pro tělo stránky */
     body {
       font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
+      display: flex;                
+      justify-content: center;      
+      align-items: center;          
+      min-height: 100vh;           
       margin: 0;
       background: #000;
-      overflow: hidden;
+      overflow: hidden;            /* Zakázání scrollování */
       color: #fff;
-      position: relative;
+      position: relative;          
     }
 
+    /* Vytvoření animovaného pozadí pomocí pseudo-elementu */
     body::before {
       content: '';
       position: fixed;
@@ -36,55 +40,62 @@
       left: -150%;
       width: 400%;
       height: 400%;
+      /* Radiální gradient pro efekt */
       background: radial-gradient(
         circle at center,
-        #8B0000 5%,
-        #2B2B2B 20%,
-        #1a1a1a 60%,
-        #111111 70%
+        #8B0000 5%,        
+        #2B2B2B 20%,       
+        #1a1a1a 60%,       
+        #111111 70%       
       );
-      animation: lavaFlow 15s ease-in-out infinite;
+      animation: lavaFlow 15s ease-in-out infinite;  /* Animace rotace pozadí */
       z-index: -2;
       opacity: 0.7;
       transform-origin: center center;
     }
 
+    /* Animace rotace pozadí */
     @keyframes lavaFlow {
       0% { transform: rotate(0deg) scale(1); }
       50% { transform: rotate(180deg) scale(1.2); }
       100% { transform: rotate(360deg) scale(1); }
     }
 
+    /* Hlavní kontejner pro obsah */
     .container {
       text-align: center;
       padding: 2rem;
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.1);    /* Poloprůhledné pozadí */
       border-radius: 20px;
-      box-shadow: 0 0 30px rgba(139, 0, 0, 0.3);
-      backdrop-filter: blur(10px);
+      box-shadow: 0 0 30px rgba(139, 0, 0, 0.3);  
+      backdrop-filter: blur(10px);              
       border: 1px solid rgba(255, 255, 255, 0.2);
-      animation: containerPulse 3s ease-in-out infinite;
+      animation: containerPulse 3s ease-in-out infinite;  /* Pulzující efekt */
       position: relative;
       z-index: 1;
       max-width: 600px;
       width: 90%;
     }
 
+    /* Animace pulzování kontejneru */
     @keyframes containerPulse {
       0%, 100% { box-shadow: 0 0 30px rgba(139, 0, 0, 0.3); }
       50% { box-shadow: 0 0 50px rgba(139, 0, 0, 0.5); }
     }
 
+    /* Styly pro nadpisy používající vlastní font */
     h1, h2 {
       font-family: 'Kosmos', Arial, sans-serif;
     }
 
+    /* Hlavní nadpis s efektem text-shadow */
     h1 {
       font-size: 3rem;
       margin-bottom: 2rem;
       text-transform: uppercase;
       letter-spacing: 0.15em;
       color: #fff;
+      /* Vícevrstvý text-shadow pro 3D efekt */
       text-shadow: 
         3px 3px 0 #8B0000,
         -1px -1px 0 #8B0000,
@@ -94,6 +105,7 @@
       animation: titleGlow 3s ease-in-out infinite;
     }
 
+    /* Podnadpisy */
     h2 {
       font-size: 1.8rem;
       margin: 1rem 0;
@@ -103,10 +115,12 @@
       text-shadow: 2px 2px 0 #8B0000;
     }
 
+    /* Nastavení fontu pro textové elementy */
     label, input[type="text"], .volume-value, .button {
       font-family: Arial, sans-serif;
     }
 
+    /* Styly pro sekce nastavení */
     .section {
       margin: 2rem 0;
       text-align: left;
@@ -116,6 +130,7 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
+    /* Popisky pro inputy */
     label {
       font-size: 1.2rem;
       margin-right: 10px;
@@ -125,6 +140,7 @@
       letter-spacing: 0.05em;
     }
 
+    /* Styly pro posuvníky hlasitosti */
     input[type="range"] {
       width: 200px;
       margin: 10px 0;
@@ -134,6 +150,7 @@
       -webkit-appearance: none;
     }
 
+    /* styling pro "kolečko" posuvníku */
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
       width: 20px;
@@ -144,6 +161,7 @@
       cursor: pointer;
     }
 
+    /* Textové inputy pro ovládací klávesy */
     input[type="text"] {
       width: 80px;
       padding: 5px;
@@ -155,6 +173,7 @@
       margin: 5px 0;
     }
 
+    /* Zobrazení hodnoty hlasitosti */
     .volume-value {
       display: inline-block;
       width: 40px;
@@ -162,12 +181,13 @@
       margin-left: 10px;
     }
 
+    /* Styly pro tlačítka */
     .button {
       display: inline-block;
       margin: 1rem 0.5rem;
       padding: 1rem 2rem;
       font-size: 1.2rem;
-      background: linear-gradient(45deg, #2B2B2B, #8B0000);
+      background: linear-gradient(45deg, #2B2B2B, #8B0000);  /* Gradient pozadí */
       color: white;
       border: 2px solid #fff;
       border-radius: 10px;
@@ -178,9 +198,10 @@
       overflow: hidden;
       letter-spacing: 0.1em;
       text-shadow: 1px 1px 0 #000;
-      animation: borderGlow 2s ease-in-out infinite;
+      animation: borderGlow 2s ease-in-out infinite;  /* Animace okraje */
     }
 
+    /* Animace svítícího okraje tlačítka */
     @keyframes borderGlow {
       0%, 100% { 
         border-color: rgba(255, 255, 255, 1);
@@ -192,10 +213,12 @@
       }
     }
 
+    /* Efekt zvětšení při najetí na tlačítko */
     .button:hover {
       transform: scale(1.05);
     }
 
+    /* Světelný efekt při najetí na tlačítko */
     .button::before {
       content: '';
       position: absolute;
@@ -212,6 +235,7 @@
       transition: 0.5s;
     }
 
+    /* Animace světelného efektu při najetí */
     .button:hover::before {
       left: 100%;
     }
@@ -221,6 +245,7 @@
   <div class="container">
     <h1>Settings</h1>
 
+    <!-- Sekce nastavení hlasitosti -->
     <div class="section">
       <h2>Volume</h2>
       <div>
@@ -235,6 +260,7 @@
       </div>
     </div>
     
+    <!-- Sekce nastavení ovládání -->
     <div class="section">
       <h2>Controls</h2>
       <div>
@@ -259,30 +285,37 @@
       </div>
     </div>
 
+    <!-- Tlačítka pro uložení a návrat -->
     <button class="button" onclick="saveSettings()">Save settings</button>
     <button class="button" onclick="window.location.href = 'index.html'">Back</button>
   </div>
 
   <script>
+    // Funkce pro převod vstupního textu na velká písmena (když se se napsalo málé nezaznamenalo to písmeno)
     function toUpperCaseInput(event) {
       event.target.value = event.target.value.toUpperCase();
     }
   
+    // Funkce pro načtení uložených nastavení z localStorage
     function loadSettings() {
+      // Načtení hodnot hlasitosti (defaultní hodnota 50)
       const musicVolume = localStorage.getItem('musicVolume') || 50;
       const sfxVolume = localStorage.getItem('sfxVolume') || 50;
   
+      // Načtení nastavení kláves (defaultní hodnoty WASD a P)
       const moveUp = localStorage.getItem('moveUp') || 'W';
       const moveDown = localStorage.getItem('moveDown') || 'S';
       const moveLeft = localStorage.getItem('moveLeft') || 'A';
       const moveRight = localStorage.getItem('moveRight') || 'D';
       const dodge = localStorage.getItem('dodge') || 'P';
   
+      // Nastavení hodnot do inputů pro hlasitost
       document.getElementById('musicVolume').value = musicVolume;
       document.getElementById('sfxVolume').value = sfxVolume;
       document.getElementById('musicVolumeValue').textContent = musicVolume;
       document.getElementById('sfxVolumeValue').textContent = sfxVolume;
   
+      // Nastavení hodnot do inputů pro klávesy
       document.getElementById('moveUp').value = moveUp;
       document.getElementById('moveDown').value = moveDown;
       document.getElementById('moveLeft').value = moveLeft;
@@ -290,40 +323,50 @@
       document.getElementById('dodge').value = dodge;
     }
   
+    // Funkce pro uložení nastavení do localStorage
     function saveSettings() {
+      // Získání hodnot hlasitosti
       const musicVolume = document.getElementById('musicVolume').value;
       const sfxVolume = document.getElementById('sfxVolume').value;
   
+      // Získání nastavených kláves
       const moveUp = document.getElementById('moveUp').value;
       const moveDown = document.getElementById('moveDown').value;
       const moveLeft = document.getElementById('moveLeft').value;
       const moveRight = document.getElementById('moveRight').value;
       const dodge = document.getElementById('dodge').value;
   
+      // Uložení hodnot hlasitosti
       localStorage.setItem('musicVolume', musicVolume);
       localStorage.setItem('sfxVolume', sfxVolume);
   
+      // Uložení nastavení kláves
       localStorage.setItem('moveUp', moveUp);
       localStorage.setItem('moveDown', moveDown);
       localStorage.setItem('moveLeft', moveLeft);
       localStorage.setItem('moveRight', moveRight);
       localStorage.setItem('dodge', dodge);
   
+      // Zobrazení potvrzení uložení
       alert('Settings saved!');
     }
   
+    // Event listener pro aktualizaci zobrazené hodnoty hudby
     document.getElementById('musicVolume').addEventListener('input', function () {
       document.getElementById('musicVolumeValue').textContent = this.value;
     });
   
+    // Event listener pro aktualizaci zobrazené hodnoty zvuků
     document.getElementById('sfxVolume').addEventListener('input', function () {
       document.getElementById('sfxVolumeValue').textContent = this.value;
     });
   
+    // Přidání event listenerů pro převod textu na velká písmena u všech textových inputů
     document.querySelectorAll('input[type="text"]').forEach(input => {
       input.addEventListener('input', toUpperCaseInput);
     });
   
+    // Spuštění načtení nastavení při načtení stránky
     loadSettings();
   </script>
   

@@ -5,11 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Records - EndlessDodge</title>
     <style>
+        /* Načtení vlastního fontu pro stylové nadpisy */
         @font-face {
             font-family: 'Kosmos';
             src: url('kosmos.ttf') format('truetype');
         }
 
+        /* Základní nastavení těla stránky */
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
@@ -20,6 +22,7 @@
             padding: 2rem 0;
         }
 
+        /* Vytvoření animovaného lávového pozadí pomocí pseudo-elementu */
         body::before {
             content: '';
             position: fixed;
@@ -27,12 +30,13 @@
             left: -150%;
             width: 400%;
             height: 400%;
+            /* Radiální gradient pro efekt lávy s přechody barev */
             background: radial-gradient(
                 circle at center,
-                #8B0000 5%,
-                #2B2B2B 20%,
-                #1a1a1a 60%,
-                #111111 70%
+                #8B0000 5%,      
+                #2B2B2B 20%,     
+                #1a1a1a 60%,     
+                #111111 70%      
             );
             animation: lavaFlow 15s ease-in-out infinite;
             z-index: -2;
@@ -40,12 +44,14 @@
             transform-origin: center center;
         }
 
+        /* Animace rotace lávového pozadí */
         @keyframes lavaFlow {
             0% { transform: rotate(0deg) scale(1); }
             50% { transform: rotate(180deg) scale(1.2); }
             100% { transform: rotate(360deg) scale(1); }
         }
 
+        /* Hlavní kontejner s rozmazaným pozadím a efekty */
         .container {
             width: 90%;
             max-width: 800px;
@@ -55,23 +61,26 @@
             background: rgba(255, 255, 255, 0.1);
             border-radius: 20px;
             box-shadow: 0 0 30px rgba(139, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);    /* Efekt rozmazání pozadí */
             border: 1px solid rgba(255, 255, 255, 0.2);
             animation: containerPulse 3s ease-in-out infinite;
             position: relative;
             z-index: 1;
         }
 
+        /* Pulzující animace stínu kontejneru */
         @keyframes containerPulse {
             0%, 100% { box-shadow: 0 0 30px rgba(139, 0, 0, 0.3); }
             50% { box-shadow: 0 0 50px rgba(139, 0, 0, 0.5); }
         }
 
+        /* Společné styly pro nadpisy */
         h1, h2 {
             font-family: 'Kosmos', Arial, sans-serif;
             text-transform: uppercase;
             letter-spacing: 0.15em;
             color: #fff;
+            /* Vícevrstvý text-shadow pro 3D efekt */
             text-shadow: 
                 3px 3px 0 #8B0000,
                 -1px -1px 0 #8B0000,
@@ -81,6 +90,7 @@
             animation: titleGlow 3s ease-in-out infinite;
         }
 
+        /* Specifické velikosti pro různé úrovně nadpisů */
         h1 {
             font-size: 3rem;
             margin-bottom: 2rem;
@@ -91,11 +101,13 @@
             margin-bottom: 1.5rem;
         }
 
+        /* Animace záře nadpisů */
         @keyframes titleGlow {
             0%, 100% { filter: brightness(1); }
             50% { filter: brightness(1.3); }
         }
 
+        /* Styly pro sekce s rekordy */
         .top3, .topRecords {
             margin: 20px 0;
             padding: 20px;
@@ -105,16 +117,19 @@
             animation: recordPulse 2s ease-in-out infinite;
         }
 
+        /* Pulzující animace pozadí sekce rekordů */
         @keyframes recordPulse {
             0%, 100% { background: rgba(139, 0, 0, 0.3); }
             50% { background: rgba(139, 0, 0, 0.5); }
         }
 
+        /* Nastavení scrollovatelné oblasti pro rekordy */
         .topRecords {
-            max-height: 300px; /* Zmenšil jsem maximální výšku */
+            max-height: 300px;
             overflow-y: auto;
         }
 
+        /* Styly pro tabulky */
         table {
             width: 100%;
             border-collapse: separate;
@@ -124,12 +139,14 @@
             background: rgba(0, 0, 0, 0.3);
         }
 
+        /* Styly pro buňky tabulky */
         th, td {
             padding: 15px;
             text-align: center;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
+        /* Speciální styly pro hlavičku tabulky */
         th {
             background: linear-gradient(45deg, #2B2B2B, #8B0000);
             color: white;
@@ -137,19 +154,22 @@
             letter-spacing: 0.1em;
             font-weight: bold;
             text-shadow: 1px 1px 0 #000;
-            position: sticky;
+            position: sticky;        /* Hlavička zůstane viditelná při scrollování */
             top: 0;
             z-index: 1;
         }
 
+        /* Zebra efekt pro řádky tabulky */
         tr:nth-child(even) {
             background: rgba(255, 255, 255, 0.05);
         }
 
+        /* Hover efekt pro řádky */
         tr:hover {
             background: rgba(139, 0, 0, 0.2);
         }
 
+        /* Styly pro tlačítko zpět */
         .backButton {
             display: inline-block;
             margin: 2rem 0.5rem;
@@ -170,6 +190,7 @@
             animation: borderGlow 2s ease-in-out infinite;
         }
 
+        /* Animace okraje tlačítka */
         @keyframes borderGlow {
             0%, 100% { 
                 border-color: rgba(255, 255, 255, 1);
@@ -181,10 +202,12 @@
             }
         }
 
+        /* Hover efekt pro tlačítko */
         .backButton:hover {
             transform: scale(1.05);
         }
 
+        /* Světelný efekt pro tlačítko */
         .backButton::before {
             content: '';
             position: absolute;
@@ -201,11 +224,12 @@
             transition: 0.5s;
         }
 
+        /* Animace světelného efektu tlačítka */
         .backButton:hover::before {
             left: 100%;
         }
 
-        /* Scrollbar styling */
+        /* Vlastní styling scrollbaru */
         .topRecords::-webkit-scrollbar {
             width: 10px;
         }
@@ -224,16 +248,18 @@
             background: rgba(139, 0, 0, 0.7);
         }
 
+        /* Zvýraznění vybraného řádku */
         .highlight {
             background: rgba(139, 0, 0, 0.4) !important;
         }
     </style>
 </head>
 <body>
+    <!-- Hlavní kontejner pro obsah -->
     <div class="container">
         <h1>Records</h1>
 
-        <!-- TOP 3 -->
+        <!-- Sekce pro top 3 hráče -->
         <div class="top3">
             <h2>TOP 3</h2>
             <table>
@@ -246,11 +272,12 @@
                     </tr>
                 </thead>
                 <tbody id="top3Records">
+                    <!-- Zde se dynamicky vloží top 3 rekordy -->
                 </tbody>
             </table>
         </div>
 
-        <!-- Ostatní rekordy -->
+        <!-- Sekce pro ostatní rekordy -->
         <div class="topRecords">
             <table>
                 <thead>
@@ -262,22 +289,29 @@
                     </tr>
                 </thead>
                 <tbody id="recordsList">
+                    <!-- Zde se dynamicky vloží zbývající rekordy -->
                 </tbody>
             </table>
         </div>
 
+        <!-- Tlačítko pro návrat -->
         <button class="backButton" onclick="window.location.href='index.html'">Back to main page</button>
     </div>
 
+    <!-- Načtení externího skriptu pro práci s úložištěm -->
     <script src="storage.js"></script>
+    
     <script>
+        // Funkce pro načtení a zobrazení rekordů
         function loadRecords() {
+            // Získání všech rekordů z úložiště
             const records = gameStorage.getAllRecords();
             
-            // TOP 3
+            // Zpracování TOP 3 rekordů
             const top3Table = document.getElementById('top3Records');
             top3Table.innerHTML = '';
     
+            // Vytvoření řádků pro top 3 hráče
             records.slice(0, 3).forEach((record, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -289,10 +323,11 @@
                 top3Table.appendChild(row);
             });
     
-            // Ostatní rekordy (4-50)
+            // Zpracování ostatních rekordů (4-50)
             const recordsTable = document.getElementById('recordsList');
             recordsTable.innerHTML = '';
     
+            // Vytvoření řádků pro ostatní hráče
             records.slice(3).forEach((record, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -305,6 +340,7 @@
             });
         }
     
+        // Načtení rekordů při spuštění stránky
         window.onload = loadRecords;
     </script>
     

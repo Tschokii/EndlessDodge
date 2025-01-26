@@ -5,32 +5,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>EndlessDodge</title>
   <style>
+    /* Načtení vlastního fontu Kosmos */
     @font-face {
       font-family: 'Kosmos';
       src: url('kosmos.ttf') format('truetype');
     }
 
+    /* Reset stylů a nastavení základního box modelu */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
+    /* Stylování těla stránky */
     body {
-      font-family: 'Kosmos', Arial, sans-serif;
-      display: flex;
+      font-family: 'Kosmos', Arial, sans-serif; 
+      display: flex; /* centrování obsahu */
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
+      min-height: 100vh; 
       margin: 0;
-      background: #000;
-      overflow: hidden;
-      color: #fff;
-      position: relative;
+      background: #000; 
+      overflow: hidden; /* Skrytí přetečení obsahu */
+      color: #fff; 
+      position: relative; /* umístění animovaného pozadí */
     }
 
+    /* animované pozadí s radiálním přechodem */
     body::before {
-      content: '';
+      content: ''; 
       position: fixed;
       top: -150%;
       left: -150%;
@@ -41,104 +45,114 @@
         #8B0000 5%,    
         #2B2B2B 20%,   
         #1a1a1a 60%,   
-        #111111 70%     
+        #111111 70%    
       );
-      animation: lavaFlow 15s ease-in-out infinite;
-      z-index: -2;
-      opacity: 0.7;
-      transform-origin: center center;
+      animation: lavaFlow 15s ease-in-out infinite; /* animace otáčení */
+      z-index: -2; /* pod veškerým obsah */
+      opacity: 0.7; 
+      transform-origin: center center; /* Střed rotace */
     }
 
+    /* Klíčové snímky animace pozadí */
     @keyframes lavaFlow {
       0% { transform: rotate(0deg) scale(1); }
       50% { transform: rotate(180deg) scale(1.2); }
       100% { transform: rotate(360deg) scale(1); }
     }
 
+    /* Stylování částic na pozadí */
     .particle {
       position: absolute;
-      width: 8px;
+      width: 8px; 
       height: 8px;
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: -1;
-      animation: particleFloat 15s linear infinite, particleColor 2s ease-in-out infinite;
+      border-radius: 50%; 
+      pointer-events: none; 
+      z-index: -1; 
+      animation: particleFloat 15s linear infinite, particleColor 2s ease-in-out infinite; /* Animace pohybu a změny barvy */
     }
 
+    /* Klíčové snímky pro pohyb částic */
     @keyframes particleFloat {
       0% { transform: translate(0, 0); }
       100% { transform: translate(var(--moveX), var(--moveY)); }
     }
 
+    /* Klíčové snímky pro změnu barvy částic */
     @keyframes particleColor {
       0%, 100% { background: #fff; }
       50% { background: #ff0000; }
     }
 
+    /* Kontejner pro obsah */
     .container {
-      text-align: center;
-      padding: 2rem;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 20px;
-      box-shadow: 0 0 30px rgba(139, 0, 0, 0.3);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      animation: containerPulse 3s ease-in-out infinite;
-      position: relative;
-      z-index: 1;
+      text-align: center; 
+      padding: 2rem; 
+      background: rgba(255, 255, 255, 0.1); /* Průhledný bílý podklad */
+      border-radius: 20px; 
+      box-shadow: 0 0 30px rgba(139, 0, 0, 0.3); 
+      backdrop-filter: blur(10px); 
+      border: 1px solid rgba(255, 255, 255, 0.2); 
+      animation: containerPulse 3s ease-in-out infinite; /* Plynulý pulzující efekt */
+      position: relative; /* Pro efekt vrstvení */
+      z-index: 1; 
     }
 
+    /* Klíčové snímky pro pulzující efekt kontejneru */
     @keyframes containerPulse {
       0%, 100% { box-shadow: 0 0 30px rgba(139, 0, 0, 0.3); }
       50% { box-shadow: 0 0 50px rgba(139, 0, 0, 0.5); }
     }
 
+    /* Stylování nadpisu */
     h1 {
-      font-size: 4rem;
-      margin-bottom: 2rem;
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-      color: #fff;
-      position: relative;
+      font-size: 4rem; 
+      margin-bottom: 2rem; 
+      text-transform: uppercase; 
+      letter-spacing: 0.15em; 
+      color: #fff; 
+      position: relative; 
       text-shadow: 
         3px 3px 0 #8B0000,
         -1px -1px 0 #8B0000,
         1px -1px 0 #8B0000,
         -1px 1px 0 #8B0000,
-        1px 1px 0 #8B0000;
-      animation: titleGlow 3s ease-in-out infinite;
+        1px 1px 0 #8B0000; /* Červené stíny */
+      animation: titleGlow 3s ease-in-out infinite; /* Pulzující efekt textu */
     }
 
+    /* Klíčové snímky pro efekt textu */
     @keyframes titleGlow {
       0%, 100% { filter: brightness(1); }
       50% { filter: brightness(1.3); }
     }
 
+    /* Stylování tlačítek */
     .button {
-      display: block;
-      margin: 1.5rem auto;
-      padding: 1rem 2rem;
-      font-size: 1.4rem;
-      font-family: 'Kosmos', Arial, sans-serif;
-      background: linear-gradient(45deg, #2B2B2B, #8B0000);
-      color: white;
-      border: 2px solid #fff;
-      border-radius: 10px;
-      cursor: pointer;
-      width: 250px;
-      transition: all 0.3s ease;
-      text-transform: uppercase;
-      position: relative;
-      overflow: hidden;
-      letter-spacing: 0.1em;
+      display: block; /* Každé tlačítko na vlastní řádce */
+      margin: 1.5rem auto; 
+      padding: 1rem 2rem; 
+      font-size: 1.4rem; 
+      font-family: 'Kosmos', Arial, sans-serif; 
+      background: linear-gradient(45deg, #2B2B2B, #8B0000); /* Přechod barvy pozadí */
+      color: white; 
+      border: 2px solid #fff; 
+      border-radius: 10px; 
+      cursor: pointer; /* Ikona kurzoru na tlačítku */
+      width: 250px; 
+      transition: all 0.3s ease; /* Plynulá změna při hoveru */
+      text-transform: uppercase; 
+      position: relative; 
+      overflow: hidden; 
+      letter-spacing: 0.1em; 
       text-shadow: 
         1px 1px 0 #000,
         -1px -1px 0 #000,
         1px -1px 0 #000,
-        -1px 1px 0 #000;
-      animation: borderGlow 2s ease-in-out infinite;
+        -1px 1px 0 #000; 
+      animation: borderGlow 2s ease-in-out infinite; /* Efekt svítícího ohraničení */
     }
 
+    /* Klíčové snímky pro efekt ohraničení tlačítka */
     @keyframes borderGlow {
       0%, 100% { 
         border-color: rgba(255, 255, 255, 1);
@@ -150,11 +164,12 @@
       }
     }
 
+    /* Efekt přechodu přes tlačítko */
     .button::before {
-      content: '';
+      content: ''; 
       position: absolute;
       top: 0;
-      left: -100%;
+      left: -100%; 
       width: 100%;
       height: 100%;
       background: linear-gradient(
@@ -162,51 +177,58 @@
         transparent,
         rgba(255, 255, 255, 0.2),
         transparent
-      );
-      transition: 0.5s;
+      ); /* Přechodová vrstva */
+      transition: 0.5s; /* Plynulý pohyb */
     }
 
+    /* Zvýraznění tlačítka při hoveru */
     .button:hover {
-      transform: scale(1.05);
+      transform: scale(1.05); /* Mírné zvětšení */
     }
 
     .button:hover::before {
-      left: 100%;
+      left: 100%; /* Přechod na druhou stranu tlačítka */
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>EndlessDodge</h1>
-    <button class="button" id="playButton">PLAY</button>
-    <button class="button" id="recordsButton">Records</button>
-    <button class="button" id="settingsButton">Settings</button>
+    <h1>EndlessDodge</h1> 
+    <button class="button" id="playButton">PLAY</button> 
+    <button class="button" id="recordsButton">Records</button> 
+    <button class="button" id="settingsButton">Settings</button> 
   </div>
 
   <script>
+    // Funkce pro vytvoření částic pozadí
     function createParticles() {
-      for(let i = 0; i < 20; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        
+      for(let i = 0; i < 20; i++) { // Vytvoří 20 částic
+        const particle = document.createElement('div'); // Vytvoří div pro částici
+        particle.className = 'particle'; // Přidá třídu "particle"
+
+        // Náhodné počáteční umístění částice
         const startX = Math.random() * window.innerWidth;
         const startY = Math.random() * window.innerHeight;
         particle.style.left = startX + 'px';
         particle.style.top = startY + 'px';
-        
+
+        // Náhodný pohyb částice
         const moveX = (Math.random() - 0.5) * window.innerWidth;
         const moveY = (Math.random() - 0.5) * window.innerHeight;
         particle.style.setProperty('--moveX', moveX + 'px');
         particle.style.setProperty('--moveY', moveY + 'px');
-        
+
+        // Náhodné zpoždění animace
         particle.style.animationDelay = (Math.random() * 5) + 's';
-        
+
+        // Přidání částice do dokumentu
         document.body.appendChild(particle);
-        
+
+        // Restart animace po jejím skončení
         particle.addEventListener('animationend', () => {
           particle.style.left = Math.random() * window.innerWidth + 'px';
           particle.style.top = Math.random() * window.innerHeight + 'px';
-          
+
           const newMoveX = (Math.random() - 0.5) * window.innerWidth;
           const newMoveY = (Math.random() - 0.5) * window.innerHeight;
           particle.style.setProperty('--moveX', newMoveX + 'px');
@@ -215,19 +237,21 @@
       }
     }
 
-    createParticles();
+    createParticles(); // Spuštění funkce pro vytvoření částic
 
+    // Přidání události kliknutí na tlačítka
     document.getElementById('playButton').addEventListener('click', function() {
-      window.location.href = 'play.html';
+      window.location.href = 'play.html'; 
     });
 
     document.getElementById('recordsButton').addEventListener('click', function() {
-      window.location.href = 'records.html';
+      window.location.href = 'records.html'; 
     });
 
     document.getElementById('settingsButton').addEventListener('click', function() {
-      window.location.href = 'settings.html';
+      window.location.href = 'settings.html'; 
     });
   </script>
 </body>
 </html>
+
