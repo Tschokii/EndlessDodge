@@ -229,12 +229,6 @@
           this.audioManager.fadeIn(this.audioManager.welcomeSong, 6); // fade in songu
           this.startCountdown(); // odpočet
         });
-
-        window.addEventListener('storage', (e) => { // Aktualizace hlasitosti při změně hodnot v localStorage
-          if (e.key === 'musicVolume' || e.key === 'sfxVolume') {
-            this.audioManager.updateVolumes();
-          }
-        });
          // Zaznam stisknuté klávesy
         window.addEventListener('keydown', (e) => { 
           this.keysPressed[e.key.toUpperCase()] = true;
