@@ -26,26 +26,15 @@ class GameStorage {
         }
 
         localStorage.setItem(this.STORAGE_KEY, JSON.stringify(records));
-        return this.isNewRecord(newRecord);
     }
 
-    // Zkontrolovat, zda je to nový rekord
-    isNewRecord(newRecord) {
+    // Získat nejlepší rekord (ne osobní, ale celkový nejlepší)
+    getBestRecord() {
         const records = this.getAllRecords();
-        if (records.length === 0) return true;
-        
-        // Porovnat s posledním osobním rekordem hráče
-        const lastPersonalRecord = records.find(record => record.nickname === newRecord.nickname);
-        if (!lastPersonalRecord) return true;
-        
-        return newRecord.time > lastPersonalRecord.time;
-    }
-
-    // Získat nejlepší osobní rekord pro přezdívku
-    getPersonalBest(nickname) {
-        const records = this.getAllRecords();
-        const personalRecords = records.filter(record => record.nickname === nickname);
-        return personalRecords.length > 0 ? personalRecords[0] : null;
+        if (records.length > 0) {
+            return records[0]; // Nejlepší rekord je ten první po seřazení
+        }
+        return null;
     }
 }
 
