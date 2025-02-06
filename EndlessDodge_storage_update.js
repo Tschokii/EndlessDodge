@@ -27,15 +27,6 @@ class GameStorage {
 
         localStorage.setItem(this.STORAGE_KEY, JSON.stringify(records));
     }
-
-    // Získat nejlepší rekord (ne osobní, ale celkový nejlepší)
-    getBestRecord() {
-        const records = this.getAllRecords();
-        if (records.length > 0) {
-            return records[0]; // Nejlepší rekord je ten první po seřazení
-        }
-        return null;
-    }
 }
 
 // Exportovat instanci pro použití v jiných souborech
